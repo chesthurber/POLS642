@@ -1,0 +1,40 @@
+---
+title: "W1L1: Introduction"
+subtitle: "POLS 642 Intermediate Analysis of Political Data"
+author: "Dr. Ches Thurber"
+format:
+  revealjs:
+    theme: moon
+editor: visual
+---
+
+## Today's Plan
+- Syllabus Overview
+- Software Housekeeping
+- Data Visualization
+
+## Syllabus Overview
+
+- Go to [syllabus](https://chesthurber.com/teaching/pols_642/POLS642_Syllabus_Spring2026.html)
+
+# Software Housekeeping
+
+## An Unsolicited Note on Software
+
+- Automatic backup!!!!
+
+- Bibliographic management
+
+- Statistical Analysis
+
+- Editor/Document Producer
+
+## Some Software Options
+
+- Backup: OneDrive, DropBox, Google Drive, iCloud
+
+- Citations: Zotero, Mendeley, EndNote
+
+- Statistical Analysis: R with RStudio IDE
+
+- Editor: MS Word, Quarto in R Studio, LaTex/Typst (?)
