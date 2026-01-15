@@ -1,5 +1,5 @@
 ---
-title: "W1L1: Introduction"
+title: "W1L2: Data Visualization"
 subtitle: "POLS 642 Intermediate Analysis of Political Data"
 author: "Dr. Ches Thurber"
 format:
