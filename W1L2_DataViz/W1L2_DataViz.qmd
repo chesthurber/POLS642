@@ -8,33 +8,306 @@ format:
 editor: visual
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
 ## Today's Plan
-- Syllabus Overview
-- Software Housekeeping
-- Data Visualization
+
+-   Syllabus Overview
+-   Software Housekeeping
+-   Data Visualization
 
 ## Syllabus Overview
 
-- Go to [syllabus](https://chesthurber.com/teaching/pols_642/POLS642_Syllabus_Spring2026.html)
+-   Go to [syllabus](https://chesthurber.com/teaching/pols_642/POLS642_Syllabus_Spring2026.html)
 
 # Software Housekeeping
 
 ## An Unsolicited Note on Software
 
-- Automatic backup!!!!
+-   Automatic backup!!!!
 
-- Bibliographic management
+-   Bibliographic management
 
-- Statistical Analysis
+-   Statistical Analysis
 
-- Editor/Document Producer
+-   Editor/Document Producer
 
 ## Some Software Options
 
-- Backup: OneDrive, DropBox, Google Drive, iCloud
+-   Backup: OneDrive, DropBox, Google Drive, iCloud
 
-- Citations: Zotero, Mendeley, EndNote
+-   Citations: Zotero, Mendeley, EndNote
 
-- Statistical Analysis: R with RStudio IDE
+-   Statistical Analysis: R with RStudio IDE
 
-- Editor: MS Word, Quarto in R Studio, LaTex/Typst (?)
+-   Editor: MS Word, Quarto in R Studio, LaTex/Typst (?)
+
+## Back to R!
+
+-   Do you have `R` installed? Updated?
+
+-   R Studio?
+
+-   Tidyverse packages?
+
+-   See Healy Chapter 2
+
+# Some Data Visualization Principles
+
+## The Importance of Looking at Data
+
+![](images/clipboard-2334011712.png)
+
+## Same line, very different data
+
+![](images/clipboard-663600904.png)
+
+## Bad Data Visualization
+
+![](images/clipboard-4049327152.png)
+
+## More Bad Data Viz
+
+![](images/clipboard-1199910489.png)
+
+## Healy's Alternative A
+
+![](images/clipboard-4289740344.png)
+
+## Healy's Alternative B
+
+![](images/clipboard-1211692154.png)
+
+# Doing it in practice
+
+
+## But when you have the chance...
+
+Check out Healy, Ch. 2. It's full of useful tidbits like:
+
+"If you only learn one keyboard shortcut in RStudio make it this one! Always use Option+minus on MacOS or Alt+minus on Windows to type the assignment operator."
+
+
+# Data Wrangling with the Tidyverse
+
+## The Tidyverse
+
+- a set of packages created by Hadley Wickham, now chief programmer at RStudio
+
+- Greatest hits include: `ggplot() tidyr() dplyr()`
+
+- the logic of "tidy data": each unit is a row, each variable is a column
+
+- a series of functions that help you do this
+
+- has its own grammar, revolving around "piping": `%>%`
+
+- great for grouping and summarizing
+
+
+## Gapminder: some already tidy data
+
+```{r}
+library(gapminder)
+head(gapminder)
+```
+
+
+
+## Subsetting the data
+
+Conventionally:
+```{r}
+Asia1 <- gapminder[gapminder$continent=="Asia",]
+```
+
+
+In Tidyspeak:
+
+```{r, message=FALSE, warning=FALSE}
+library(dplyr)
+Asia2 <- filter(gapminder, continent=="Asia")
+```
+
+With Piping:
+
+```{r}
+Asia3 <- gapminder %>%
+  filter(continent=="Asia")
+```
+
+
+## Piping
+
+- allows you to do multiple things at once
+- sends the output of the previous line as the first input of the next
+
+```{r}
+Asia4 <- gapminder %>%
+  filter(continent=="Asia")%>%
+  arrange(gdpPercap)
+
+head(Asia4)
+```
+
+
+## Summarizing
+
+```{r}
+lifeExpbyYear <- gapminder %>%
+  group_by(year) %>%
+  summarize(MedLifeExp = median(lifeExp))
+
+head(lifeExpbyYear)
+```
+
+
+
+
+
+# GGPlot
+
+
+## Step 1: Mapping the data
+
+```{r, out.width = '50%'}
+library(ggplot2)
+
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp))
+```
+
+
+## Step 2: Adding the points
+
+```{r, out.width = '50%'}
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) + 
+  geom_point()
+
+```
+
+
+## Step 3: Add a fitted curve
+
+```{r, warning=F, message=F, out.width = '50%'}
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) + 
+  geom_point() + 
+  geom_smooth()
+```
+
+
+
+## Force the curve to be linear
+
+```{r, warning=F, message=F, out.width = '50%'}
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) + 
+  geom_point() + 
+  geom_smooth(method="lm")
+```
+
+
+## Rescale the x-axis
+
+```{r, warning=F, message=F, out.width = '50%'}
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) + 
+  geom_point() + 
+  geom_smooth(method="lm") + 
+  scale_x_log10()
+```
+
+
+## Step 4: Refining
+
+```{r}
+
+p <- ggplot(gapminder, aes(x = gdpPercap, y=lifeExp)) + 
+    geom_point(alpha = 0.3) +
+    geom_smooth(method = "lm") +
+    scale_x_log10(labels = scales::dollar) +
+    labs(x = "GDP Per Capita", y = "Life Expectancy in Years",
+         title = "Economic Growth and Life Expectancy",
+         subtitle = "Data points are country-years",
+         caption = "Source: Gapminder.")
+```
+
+## So elegant!
+
+```{r, echo=F, warning=F, message=F, out.width = '50%'}
+p
+```
+
+
+
+## Play with Themes (BW)
+
+```{r, warning=F, message=F, out.width = '50%'}
+p + theme_bw()
+```
+
+
+
+## Classic
+
+```{r, warning=F, message=F, out.width = '50%'}
+p + theme_classic()
+```
+
+
+## Color code by Continent
+
+```{r}
+p1 <- ggplot(gapminder,
+            aes(x = gdpPercap,
+                          y = lifeExp,
+                          color = continent,
+                          fill = continent)) + 
+    geom_point() +
+    geom_smooth(method = "lm") +
+  labs(x = "GDP Per Capita", y = "Life Expectancy in Years",
+         title = "Economic Growth and Life Expectancy by Continent",
+         subtitle = "Data points are country-years",
+         caption = "Source: Gapminder.",
+       color= "Continent",
+       fill="Continent") +
+    scale_x_log10(labels=scales::dollar)
+```
+
+
+## Pretty, but a little confusing...
+```{r, echo=F, warning=F, message=F, out.width = '50%'}
+p1 
+```
+
+
+## Create a single fitted line
+
+```{r}
+p2 <- ggplot(gapminder, aes(x = gdpPercap, y = lifeExp))+
+    geom_point(mapping = aes(color = continent)) +
+    geom_smooth(method = "lm") +
+    scale_x_log10(labels=scales::dollar) +
+  labs(x = "GDP Per Capita", y = "Life Expectancy in Years",
+         title = "Economic Growth and Life Expectancy by Continent",
+         subtitle = "Data points are country-years",
+         caption = "Source: Gapminder.",
+       color= "Continent")
+```
+
+## How does this compare?
+```{r, echo=F, warning=F, message=F, out.width = '50%'}
+p2 
+```
+
+
+## Faceting
+
+```{r, warning=F, message=F, out.width = '50%'}
+p2 + facet_wrap(~continent)
+```
+
+
+## Saving Plots
+```{r}
+ggsave("LifeGDP.png",p2)
+```

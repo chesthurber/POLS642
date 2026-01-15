@@ -29,6 +29,71 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #f8f8f2;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #f8f8f2; } /* Normal */
+    code span.al { color: #f07178; background-color: #2a0f15; font-weight: bold; } /* Alert */
+    code span.an { color: #d4d0ab; } /* Annotation */
+    code span.at { color: #00e0e0; } /* Attribute */
+    code span.bn { color: #d4d0ab; } /* BaseN */
+    code span.bu { color: #abe338; } /* BuiltIn */
+    code span.cf { color: #ffa07a; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #abe338; } /* Char */
+    code span.cn { color: #ffd700; } /* Constant */
+    code span.co { color: #f8f8f2; font-style: italic; } /* Comment */
+    code span.cv { color: #ffd700; } /* CommentVar */
+    code span.do { color: #f8f8f2; } /* Documentation */
+    code span.dt { color: #ffa07a; } /* DataType */
+    code span.dv { color: #d4d0ab; } /* DecVal */
+    code span.er { color: #f07178; text-decoration: underline; } /* Error */
+    code span.ex { color: #00e0e0; font-weight: bold; } /* Extension */
+    code span.fl { color: #d4d0ab; } /* Float */
+    code span.fu { color: #ffa07a; } /* Function */
+    code span.im { color: #abe338; } /* Import */
+    code span.in { color: #d4d0ab; } /* Information */
+    code span.kw { color: #ffa07a; font-weight: bold; } /* Keyword */
+    code span.op { color: #ffa07a; } /* Operator */
+    code span.ot { color: #00e0e0; } /* Other */
+    code span.pp { color: #dcc6e0; } /* Preprocessor */
+    code span.re { color: #00e0e0; background-color: #f8f8f2; } /* RegionMarker */
+    code span.sc { color: #abe338; } /* SpecialChar */
+    code span.ss { color: #abe338; } /* SpecialString */
+    code span.st { color: #abe338; } /* String */
+    code span.va { color: #00e0e0; } /* Variable */
+    code span.vs { color: #abe338; } /* VerbatimString */
+    code span.wa { color: #dcc6e0; } /* Warning */
   </style>
   <link rel="stylesheet" href="W1L2_DataViz_files/libs/revealjs/dist/theme/quarto.css">
   <link href="W1L2_DataViz_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -374,6 +439,286 @@ Dr.&nbsp;Ches Thurber
 <li><p>Statistical Analysis: R with RStudio IDE</p></li>
 <li><p>Editor: MS Word, Quarto in R Studio, LaTex/Typst (?)</p></li>
 </ul>
+</section>
+<section id="back-to-r" class="slide level2">
+<h2>Back to R!</h2>
+<ul>
+<li><p>Do you have <code>R</code> installed? Updated?</p></li>
+<li><p>R Studio?</p></li>
+<li><p>Tidyverse packages?</p></li>
+<li><p>See Healy Chapter 2</p></li>
+</ul>
+</section></section>
+<section>
+<section id="some-data-visualization-principles" class="title-slide slide level1 center">
+<h1>Some Data Visualization Principles</h1>
+
+</section>
+<section id="the-importance-of-looking-at-data" class="slide level2">
+<h2>The Importance of Looking at Data</h2>
+
+<img data-src="images/clipboard-2334011712.png" class="r-stretch"></section>
+<section id="same-line-very-different-data" class="slide level2">
+<h2>Same line, very different data</h2>
+
+<img data-src="images/clipboard-663600904.png" class="r-stretch"></section>
+<section id="bad-data-visualization" class="slide level2">
+<h2>Bad Data Visualization</h2>
+
+<img data-src="images/clipboard-4049327152.png" class="r-stretch"></section>
+<section id="more-bad-data-viz" class="slide level2">
+<h2>More Bad Data Viz</h2>
+
+<img data-src="images/clipboard-1199910489.png" class="r-stretch"></section>
+<section id="healys-alternative-a" class="slide level2">
+<h2>Healy’s Alternative A</h2>
+
+<img data-src="images/clipboard-4289740344.png" class="r-stretch"></section>
+<section id="healys-alternative-b" class="slide level2">
+<h2>Healy’s Alternative B</h2>
+
+<img data-src="images/clipboard-1211692154.png" class="r-stretch"></section></section>
+<section>
+<section id="doing-it-in-practice" class="title-slide slide level1 center">
+<h1>Doing it in practice</h1>
+
+</section>
+<section id="but-when-you-have-the-chance" class="slide level2">
+<h2>But when you have the chance…</h2>
+<p>Check out Healy, Ch. 2. It’s full of useful tidbits like:</p>
+<p>“If you only learn one keyboard shortcut in RStudio make it this one! Always use Option+minus on MacOS or Alt+minus on Windows to type the assignment operator.”</p>
+</section></section>
+<section>
+<section id="data-wrangling-with-the-tidyverse" class="title-slide slide level1 center">
+<h1>Data Wrangling with the Tidyverse</h1>
+
+</section>
+<section id="the-tidyverse" class="slide level2">
+<h2>The Tidyverse</h2>
+<ul>
+<li><p>a set of packages created by Hadley Wickham, now chief programmer at RStudio</p></li>
+<li><p>Greatest hits include: <code>ggplot() tidyr() dplyr()</code></p></li>
+<li><p>the logic of “tidy data”: each unit is a row, each variable is a column</p></li>
+<li><p>a series of functions that help you do this</p></li>
+<li><p>has its own grammar, revolving around “piping”: <code>%&gt;%</code></p></li>
+<li><p>great for grouping and summarizing</p></li>
+</ul>
+</section>
+<section id="gapminder-some-already-tidy-data" class="slide level2">
+<h2>Gapminder: some already tidy data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a><span class="fu">library</span>(gapminder)</span>
+<span id="cb1-2"><a href=""></a><span class="fu">head</span>(gapminder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 6
+  country     continent  year lifeExp      pop gdpPercap
+  &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+1 Afghanistan Asia       1952    28.8  8425333      779.
+2 Afghanistan Asia       1957    30.3  9240934      821.
+3 Afghanistan Asia       1962    32.0 10267083      853.
+4 Afghanistan Asia       1967    34.0 11537966      836.
+5 Afghanistan Asia       1972    36.1 13079460      740.
+6 Afghanistan Asia       1977    38.4 14880372      786.</code></pre>
+</div>
+</div>
+</section>
+<section id="subsetting-the-data" class="slide level2">
+<h2>Subsetting the data</h2>
+<p>Conventionally:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a>Asia1 <span class="ot">&lt;-</span> gapminder[gapminder<span class="sc">$</span>continent<span class="sc">==</span><span class="st">"Asia"</span>,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In Tidyspeak:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb4-2"><a href=""></a>Asia2 <span class="ot">&lt;-</span> <span class="fu">filter</span>(gapminder, continent<span class="sc">==</span><span class="st">"Asia"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>With Piping:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a>Asia3 <span class="ot">&lt;-</span> gapminder <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href=""></a>  <span class="fu">filter</span>(continent<span class="sc">==</span><span class="st">"Asia"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="piping" class="slide level2">
+<h2>Piping</h2>
+<ul>
+<li>allows you to do multiple things at once</li>
+<li>sends the output of the previous line as the first input of the next</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a>Asia4 <span class="ot">&lt;-</span> gapminder <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href=""></a>  <span class="fu">filter</span>(continent<span class="sc">==</span><span class="st">"Asia"</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href=""></a>  <span class="fu">arrange</span>(gdpPercap)</span>
+<span id="cb6-4"><a href=""></a></span>
+<span id="cb6-5"><a href=""></a><span class="fu">head</span>(Asia4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 6
+  country  continent  year lifeExp      pop gdpPercap
+  &lt;fct&gt;    &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+1 Myanmar  Asia       1952    36.3 20092996      331 
+2 Myanmar  Asia       1992    59.3 40546538      347 
+3 Myanmar  Asia       1967    49.4 25870271      349 
+4 Myanmar  Asia       1957    41.9 21731844      350 
+5 Myanmar  Asia       1972    53.1 28466390      357 
+6 Cambodia Asia       1952    39.4  4693836      368.</code></pre>
+</div>
+</div>
+</section>
+<section id="summarizing" class="slide level2">
+<h2>Summarizing</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a>lifeExpbyYear <span class="ot">&lt;-</span> gapminder <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href=""></a>  <span class="fu">group_by</span>(year) <span class="sc">%&gt;%</span></span>
+<span id="cb8-3"><a href=""></a>  <span class="fu">summarize</span>(<span class="at">MedLifeExp =</span> <span class="fu">median</span>(lifeExp))</span>
+<span id="cb8-4"><a href=""></a></span>
+<span id="cb8-5"><a href=""></a><span class="fu">head</span>(lifeExpbyYear)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 2
+   year MedLifeExp
+  &lt;int&gt;      &lt;dbl&gt;
+1  1952       45.1
+2  1957       48.4
+3  1962       50.9
+4  1967       53.8
+5  1972       56.5
+6  1977       59.7</code></pre>
+</div>
+</div>
+</section></section>
+<section>
+<section id="ggplot" class="title-slide slide level1 center">
+<h1>GGPlot</h1>
+
+</section>
+<section id="step-1-mapping-the-data" class="slide level2">
+<h2>Step 1: Mapping the data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb10-2"><a href=""></a></span>
+<span id="cb10-3"><a href=""></a><span class="fu">ggplot</span>(gapminder, <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="W1L2_DataViz_files/figure-revealjs/unnamed-chunk-7-1.png" style="width:50.0%" class="r-stretch"></section>
+<section id="step-2-adding-the-points" class="slide level2">
+<h2>Step 2: Adding the points</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href=""></a><span class="fu">ggplot</span>(gapminder, <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span> </span>
+<span id="cb11-2"><a href=""></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="W1L2_DataViz_files/figure-revealjs/unnamed-chunk-8-1.png" style="width:50.0%" class="r-stretch"></section>
+<section id="step-3-add-a-fitted-curve" class="slide level2">
+<h2>Step 3: Add a fitted curve</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a><span class="fu">ggplot</span>(gapminder, <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span> </span>
+<span id="cb12-2"><a href=""></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb12-3"><a href=""></a>  <span class="fu">geom_smooth</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="W1L2_DataViz_files/figure-revealjs/unnamed-chunk-9-1.png" style="width:50.0%" class="r-stretch"></section>
+<section id="force-the-curve-to-be-linear" class="slide level2">
+<h2>Force the curve to be linear</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href=""></a><span class="fu">ggplot</span>(gapminder, <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span> </span>
+<span id="cb13-2"><a href=""></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb13-3"><a href=""></a>  <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">"lm"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="W1L2_DataViz_files/figure-revealjs/unnamed-chunk-10-1.png" style="width:50.0%" class="r-stretch"></section>
+<section id="rescale-the-x-axis" class="slide level2">
+<h2>Rescale the x-axis</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href=""></a><span class="fu">ggplot</span>(gapminder, <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp)) <span class="sc">+</span> </span>
+<span id="cb14-2"><a href=""></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb14-3"><a href=""></a>  <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">"lm"</span>) <span class="sc">+</span> </span>
+<span id="cb14-4"><a href=""></a>  <span class="fu">scale_x_log10</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="W1L2_DataViz_files/figure-revealjs/unnamed-chunk-11-1.png" style="width:50.0%" class="r-stretch"></section>
+<section id="step-4-refining" class="slide level2">
+<h2>Step 4: Refining</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href=""></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(gapminder, <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y=</span>lifeExp)) <span class="sc">+</span> </span>
+<span id="cb15-2"><a href=""></a>    <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb15-3"><a href=""></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb15-4"><a href=""></a>    <span class="fu">scale_x_log10</span>(<span class="at">labels =</span> scales<span class="sc">::</span>dollar) <span class="sc">+</span></span>
+<span id="cb15-5"><a href=""></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"GDP Per Capita"</span>, <span class="at">y =</span> <span class="st">"Life Expectancy in Years"</span>,</span>
+<span id="cb15-6"><a href=""></a>         <span class="at">title =</span> <span class="st">"Economic Growth and Life Expectancy"</span>,</span>
+<span id="cb15-7"><a href=""></a>         <span class="at">subtitle =</span> <span class="st">"Data points are country-years"</span>,</span>
+<span id="cb15-8"><a href=""></a>         <span class="at">caption =</span> <span class="st">"Source: Gapminder."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="so-elegant" class="slide level2">
+<h2>So elegant!</h2>
+
+<img data-src="W1L2_DataViz_files/figure-revealjs/unnamed-chunk-13-1.png" style="width:50.0%" class="r-stretch"></section>
+<section id="play-with-themes-bw" class="slide level2">
+<h2>Play with Themes (BW)</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href=""></a>p <span class="sc">+</span> <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="W1L2_DataViz_files/figure-revealjs/unnamed-chunk-14-1.png" style="width:50.0%" class="r-stretch"></section>
+<section id="classic" class="slide level2">
+<h2>Classic</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href=""></a>p <span class="sc">+</span> <span class="fu">theme_classic</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="W1L2_DataViz_files/figure-revealjs/unnamed-chunk-15-1.png" style="width:50.0%" class="r-stretch"></section>
+<section id="color-code-by-continent" class="slide level2">
+<h2>Color code by Continent</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href=""></a>p1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(gapminder,</span>
+<span id="cb18-2"><a href=""></a>            <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap,</span>
+<span id="cb18-3"><a href=""></a>                          <span class="at">y =</span> lifeExp,</span>
+<span id="cb18-4"><a href=""></a>                          <span class="at">color =</span> continent,</span>
+<span id="cb18-5"><a href=""></a>                          <span class="at">fill =</span> continent)) <span class="sc">+</span> </span>
+<span id="cb18-6"><a href=""></a>    <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb18-7"><a href=""></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb18-8"><a href=""></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"GDP Per Capita"</span>, <span class="at">y =</span> <span class="st">"Life Expectancy in Years"</span>,</span>
+<span id="cb18-9"><a href=""></a>         <span class="at">title =</span> <span class="st">"Economic Growth and Life Expectancy by Continent"</span>,</span>
+<span id="cb18-10"><a href=""></a>         <span class="at">subtitle =</span> <span class="st">"Data points are country-years"</span>,</span>
+<span id="cb18-11"><a href=""></a>         <span class="at">caption =</span> <span class="st">"Source: Gapminder."</span>,</span>
+<span id="cb18-12"><a href=""></a>       <span class="at">color=</span> <span class="st">"Continent"</span>,</span>
+<span id="cb18-13"><a href=""></a>       <span class="at">fill=</span><span class="st">"Continent"</span>) <span class="sc">+</span></span>
+<span id="cb18-14"><a href=""></a>    <span class="fu">scale_x_log10</span>(<span class="at">labels=</span>scales<span class="sc">::</span>dollar)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="pretty-but-a-little-confusing" class="slide level2">
+<h2>Pretty, but a little confusing…</h2>
+
+<img data-src="W1L2_DataViz_files/figure-revealjs/unnamed-chunk-17-1.png" style="width:50.0%" class="r-stretch"></section>
+<section id="create-a-single-fitted-line" class="slide level2">
+<h2>Create a single fitted line</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href=""></a>p2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(gapminder, <span class="fu">aes</span>(<span class="at">x =</span> gdpPercap, <span class="at">y =</span> lifeExp))<span class="sc">+</span></span>
+<span id="cb19-2"><a href=""></a>    <span class="fu">geom_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">color =</span> continent)) <span class="sc">+</span></span>
+<span id="cb19-3"><a href=""></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>) <span class="sc">+</span></span>
+<span id="cb19-4"><a href=""></a>    <span class="fu">scale_x_log10</span>(<span class="at">labels=</span>scales<span class="sc">::</span>dollar) <span class="sc">+</span></span>
+<span id="cb19-5"><a href=""></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"GDP Per Capita"</span>, <span class="at">y =</span> <span class="st">"Life Expectancy in Years"</span>,</span>
+<span id="cb19-6"><a href=""></a>         <span class="at">title =</span> <span class="st">"Economic Growth and Life Expectancy by Continent"</span>,</span>
+<span id="cb19-7"><a href=""></a>         <span class="at">subtitle =</span> <span class="st">"Data points are country-years"</span>,</span>
+<span id="cb19-8"><a href=""></a>         <span class="at">caption =</span> <span class="st">"Source: Gapminder."</span>,</span>
+<span id="cb19-9"><a href=""></a>       <span class="at">color=</span> <span class="st">"Continent"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="how-does-this-compare" class="slide level2">
+<h2>How does this compare?</h2>
+
+<img data-src="W1L2_DataViz_files/figure-revealjs/unnamed-chunk-19-1.png" style="width:50.0%" class="r-stretch"></section>
+<section id="faceting" class="slide level2">
+<h2>Faceting</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href=""></a>p2 <span class="sc">+</span> <span class="fu">facet_wrap</span>(<span class="sc">~</span>continent)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="W1L2_DataViz_files/figure-revealjs/unnamed-chunk-20-1.png" style="width:50.0%" class="r-stretch"></section>
+<section id="saving-plots" class="slide level2">
+<h2>Saving Plots</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href=""></a><span class="fu">ggsave</span>(<span class="st">"LifeGDP.png"</span>,p2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 
@@ -590,6 +935,44 @@ Dr.&nbsp;Ches Thurber
         ]
       });
     </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
       const toggleBodyColorMode = (bsSheetEl) => {
