@@ -4,7 +4,7 @@ subtitle: "POLS 642 Intermediate Analysis of Political Data"
 author: "Dr. Ches Thurber"
 format:
   revealjs:
-    theme: moon
+    theme: simple
 editor: visual
 ---
 
@@ -82,30 +82,27 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Doing it in practice
 
-
 ## But when you have the chance...
 
 Check out Healy, Ch. 2. It's full of useful tidbits like:
 
 "If you only learn one keyboard shortcut in RStudio make it this one! Always use Option+minus on MacOS or Alt+minus on Windows to type the assignment operator."
 
-
 # Data Wrangling with the Tidyverse
 
 ## The Tidyverse
 
-- a set of packages created by Hadley Wickham, now chief programmer at RStudio
+-   a set of packages created by Hadley Wickham, now chief programmer at RStudio
 
-- Greatest hits include: `ggplot() tidyr() dplyr()`
+-   Greatest hits include: `ggplot() tidyr() dplyr()`
 
-- the logic of "tidy data": each unit is a row, each variable is a column
+-   the logic of "tidy data": each unit is a row, each variable is a column
 
-- a series of functions that help you do this
+-   a series of functions that help you do this
 
-- has its own grammar, revolving around "piping": `%>%`
+-   has its own grammar, revolving around "piping": `%>%`
 
-- great for grouping and summarizing
-
+-   great for grouping and summarizing
 
 ## Gapminder: some already tidy data
 
@@ -114,15 +111,13 @@ library(gapminder)
 head(gapminder)
 ```
 
-
-
 ## Subsetting the data
 
 Conventionally:
+
 ```{r}
 Asia1 <- gapminder[gapminder$continent=="Asia",]
 ```
-
 
 In Tidyspeak:
 
@@ -138,11 +133,10 @@ Asia3 <- gapminder %>%
   filter(continent=="Asia")
 ```
 
-
 ## Piping
 
-- allows you to do multiple things at once
-- sends the output of the previous line as the first input of the next
+-   allows you to do multiple things at once
+-   sends the output of the previous line as the first input of the next
 
 ```{r}
 Asia4 <- gapminder %>%
@@ -151,7 +145,6 @@ Asia4 <- gapminder %>%
 
 head(Asia4)
 ```
-
 
 ## Summarizing
 
@@ -163,12 +156,7 @@ lifeExpbyYear <- gapminder %>%
 head(lifeExpbyYear)
 ```
 
-
-
-
-
 # GGPlot
-
 
 ## Step 1: Mapping the data
 
@@ -178,7 +166,6 @@ library(ggplot2)
 ggplot(gapminder, aes(x = gdpPercap, y = lifeExp))
 ```
 
-
 ## Step 2: Adding the points
 
 ```{r, out.width = '50%'}
@@ -186,7 +173,6 @@ ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) +
   geom_point()
 
 ```
-
 
 ## Step 3: Add a fitted curve
 
@@ -196,8 +182,6 @@ ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) +
   geom_smooth()
 ```
 
-
-
 ## Force the curve to be linear
 
 ```{r, warning=F, message=F, out.width = '50%'}
@@ -205,7 +189,6 @@ ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) +
   geom_point() + 
   geom_smooth(method="lm")
 ```
-
 
 ## Rescale the x-axis
 
@@ -215,7 +198,6 @@ ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) +
   geom_smooth(method="lm") + 
   scale_x_log10()
 ```
-
 
 ## Step 4: Refining
 
@@ -237,22 +219,17 @@ p <- ggplot(gapminder, aes(x = gdpPercap, y=lifeExp)) +
 p
 ```
 
-
-
 ## Play with Themes (BW)
 
 ```{r, warning=F, message=F, out.width = '50%'}
 p + theme_bw()
 ```
 
-
-
 ## Classic
 
 ```{r, warning=F, message=F, out.width = '50%'}
 p + theme_classic()
 ```
-
 
 ## Color code by Continent
 
@@ -273,12 +250,11 @@ p1 <- ggplot(gapminder,
     scale_x_log10(labels=scales::dollar)
 ```
 
-
 ## Pretty, but a little confusing...
+
 ```{r, echo=F, warning=F, message=F, out.width = '50%'}
 p1 
 ```
-
 
 ## Create a single fitted line
 
@@ -295,10 +271,10 @@ p2 <- ggplot(gapminder, aes(x = gdpPercap, y = lifeExp))+
 ```
 
 ## How does this compare?
+
 ```{r, echo=F, warning=F, message=F, out.width = '50%'}
 p2 
 ```
-
 
 ## Faceting
 
@@ -306,8 +282,8 @@ p2
 p2 + facet_wrap(~continent)
 ```
 
-
 ## Saving Plots
+
 ```{r}
 ggsave("LifeGDP.png",p2)
 ```

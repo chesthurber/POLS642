@@ -1,0 +1,221 @@
+---
+title: "W4L1: Univariate Description"
+subtitle: "POLS 641 Introductory Analysis of Political Data"
+author: "Dr. Ches Thurber"
+format: 
+  revealjs:
+    theme: blood
+execute: 
+  echo: true
+editor: visual
+---
+
+## Get Started
+
+1\) Download `W4L1_Description.zip` from Blackboard
+
+2\) "Unzip" it and get the files set up in your file directory the way you want them
+
+a\) `W4L1_Description.qmd`
+
+b\) `W4L1_Description.html`
+
+c\) `BES.csv`
+
+3\) Open up your R Project
+
+## What kinds of arguments do we make in political science?
+
+-   conceptual
+
+-   **descriptive: pure description; descriptive inference**
+
+-   predictive
+
+-   causal
+
+-   normative
+
+-   prescriptive\
+
+## Populations and Samples
+
+-   *Population*: all of some unit of analysis that exists (or could exist)
+-   *Sample*: a subset of the population that we are able to measure (our dataset)
+-   *Observation*: a single unit from our sample (row in our dataset)
+-   *Variable*: measured attributes of each observation (columns in our dataset)
+
+## Description
+
+-   Description: characteristics of the sample
+
+    -   Central tendency (mean, median, mode)
+
+    -   Dispersion (quartiles, min/max, standard deviation)
+
+## Descriptive Inference
+
+-   Descriptive Inference: estimate the characteristics of the population based on the sample
+
+    -   if the sample is *representative*, then it should offer an *unbiased* estimate of the characteristics of the population
+
+    -   a sample that is *random* is often a good place to start in trying to achieve a sample that is *representative*
+
+    -   But, in elections, this is hard...
+
+## Potential Challenges
+
+-   sampling frame
+
+-   unit nonresponse
+
+-   item nonresponse
+
+-   misreporting
+
+# Tables in R
+
+## Loading Data
+
+1\) Check your working directory
+
+```{r}
+getwd()
+```
+
+2\) Load the data (visually, or with code)
+
+```{r}
+bes <- read.csv("BES.csv")
+```
+
+## Look at the Data
+
+Show the first five rows:
+
+```{r}
+head(bes)
+```
+
+## Creating a Frequency/Contingency Table
+
+```{r}
+
+table(bes$vote)
+```
+
+## Creating a Proportion Table
+
+```{r}
+
+prop.table(table(bes$vote))
+```
+
+# Missing Data
+
+## What's wrong here?
+
+```{r}
+
+mean(bes$leave)
+```
+
+## Missing Data
+
+```{r}
+
+table(bes$leave, exclude = NULL)
+```
+
+## A Quick Solution
+
+```{r}
+
+mean(bes$leave, na.rm=T)
+```
+
+## Stop and Think!
+
+-   I don't like the textbook's solution of deleting all missing data
+-   You need to think about *why* data is missing
+-   What bias might you be introducing into the inferences you make about the population when you remove missing data from your sample?
+-   usually you will have to remove/ignore the missing data to proceed with analysis
+
+# Descriptive Statistics
+
+## Central Tendency
+
+-   where is the "middle" of the distribution?
+
+-   median: the "middle" observation when you put them in order
+
+-   mean: $$\bar x = \frac{\sum_{i=1}^{n}x_i}{n}$$
+
+## Dispersion
+
+-   min/max
+
+-   quintiles (value of variable at which 10%, 25%, 75%, 90% etc... of observations are lower)
+
+-   standard deviation: like the average distance from the mean $$\sigma = \sqrt{\frac{\sum_{i=1}^n (x_i - \bar{x})^2}{n}}$$
+
+-   variance: squared standard deviation
+
+## Summary Stats at once
+
+```{r}
+summary(bes$age)
+```
+
+## Standard Deviation and Variance in `R`
+
+```{r}
+
+sd(bes$age, na.rm=T)
+var(bes$age, na.rm=T)
+```
+
+# Plotting Data
+
+## Boxplots
+
+```{r}
+
+boxplot(bes$age)
+```
+
+## Histogram
+
+-   a *histogram* is a graphical representation of a variable's distribution
+
+-   it is made of of "bins" of intervals of the variable on the x-axis (left-right)
+
+-   the y-axis (top-bottom) represents the number of observations of the variable within each "binned" interval
+
+## A Histogram of Respondent Age
+
+```{r}
+
+hist(bes$age)
+```
+
+## Density Histogram
+
+-   a histogram where the scale of the x-axis is adjusted so that the total "area" adds up to 1
+
+-   density of the bin = proportion of observations in the bin / width of the bin
+
+-   it's useful because we can compare to density histograms of other samples with different numbers of observations
+
+## A Density Histogram of Respondent Age
+
+```{r}
+
+hist(bes$age, freq= FALSE)
+```
+
+## Wrap up
+
+-   Thursday: Descriptive Statistics of 2 variables
+-   Next week: Visualizing Data
+-   Due next Friday: Data Camp `Tidyverse` unit (four chapters)
