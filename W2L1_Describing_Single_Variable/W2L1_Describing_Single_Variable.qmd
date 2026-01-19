@@ -1,10 +1,10 @@
 ---
-title: "W4L1: Univariate Description"
-subtitle: "POLS 641 Introductory Analysis of Political Data"
+title: "W2L1: Description of a Single Variable"
+subtitle: "POLS 642 Intermediate Analysis of Political Data"
 author: "Dr. Ches Thurber"
 format: 
   revealjs:
-    theme: blood
+    theme: simple
 execute: 
   echo: true
 editor: visual
@@ -12,31 +12,141 @@ editor: visual
 
 ## Get Started
 
-1\) Download `W4L1_Description.zip` from Blackboard
+1\) Follow link on Blackboard to download `W2L1_Description_Single_Variable.zip`
 
 2\) "Unzip" it and get the files set up in your file directory the way you want them
 
-a\) `W4L1_Description.qmd`
+a\) `W2L1_Description_Single_Variable.qmd`
 
-b\) `W4L1_Description.html`
+b\) `W2L1_Description_Single_Variable.html`
 
 c\) `BES.csv`
 
 3\) Open up your R Project
 
-## What kinds of arguments do we make in political science?
+## Plan for Today
 
--   conceptual
+1\) Concepts and Measures
 
--   **descriptive: pure description; descriptive inference**
+2\) Describing Data Statistically
 
--   predictive
+3\) Describing Data Visually
 
--   causal
+# Concepts and Measures
 
--   normative
+## Social "Science"
 
--   prescriptive\
+-   "social science involves the systematic application of reason and evidence to problems with explicit attention to method and to possible sources of error" (Gerring and Christensen p. 24)
+
+## Breaking that Down
+
+1)  Defining *concepts* that help us label and describe social phenomena
+
+2)  Theorizing relationships between concepts
+
+3)  *Measuring* those concepts in the real world
+
+4)  *Measuring* the relationship between those concepts
+
+5)  Systematically assessing whether the evidence from those measurements is consistent or discongruous with purported theories.
+
+## Kinds of Questions
+
+Purely conceptual:
+
+-   "What is democracy?"
+-   "What is war"
+
+Descriptive about a single concept:
+
+-   "Is the world getting more democratic?"
+-   "Is the world experiencing fewer wars?"
+
+## More Kinds of Questions
+
+Descriptive about relationship:
+
+-   "Have democratic countries fought fewer wars than non-democratic countries?"
+
+Causal:
+
+-   "Does being a democracy make a country less likely to fight wars?"
+
+## Normative and Prescriptive Questions
+
+Normative/Philosophical Questions:
+
+-   What kind of government is best?
+
+Normative/Prescriptive Questions:
+
+-   How can we reduce human rights abuses around the world?
+
+## Puzzle-driven questions
+
+-   Variation to be explained: In Illinois, you can register to vote on election day, you don't need photo ID at the polls, and anyone can vote early or by mail. In Texas, the opposite.
+
+-   Abstracted: Why do some states make it much harder to vote than other states?
+
+-   What are possible explanations for observed variation in a given phenomenon/concept/ variable (Y)
+
+## Conceptual Arguments
+
+-   "democracy is a form of government in which political leaders are elected by the population"
+
+-   "No, it's not just about elections! there must be constraints on elected officials from an independent judiciary, basic freedoms like freedm of speech, and civil attitides that encourage and achieve broad political participation!"
+
+## Descriptive Arguments
+
+-   "War is on the decline! Fewer people are dying in battle than at any other time in human history!"
+
+-   "No, it's not! Deaths as a percentage of population might have, but total numbers have not. Also, there's too much statistical noise to know if this is really a trend. WWIII could start tomorrow!"
+
+## Causal Arguments
+
+-   "When two countries are both democracies, they are less likely to go to war."
+-   "No, they are just as likely, it's just that most democracies have been allies in the post-WWII period. Allies are less likely to fight, democracy makes no difference"
+
+# Concepts and Measures
+
+## Defining Concepts
+
+-   A *conceptual definition* clearly describes the concepts measurable properties and specifies the units of analysis to which the concept applies
+    -   specifies units of analysis
+    -   suggests the potential for variation along a constitutive set of characteristics
+    -   provides a theoretical way of determining the degree to which units exhibit those characteristics (i.e. the concept must be measurable in theory and hopefully in practice)
+
+## Pollock's Conceptual Definition Template
+
+*The concept of \[CONCEPT NAME\] is defined as the extent to which \[UNIT OF ANALYSIS\] exhibit the characteristic of \[CHARACTERISTICS THAT CONSTITUTE CONCEPT\]*
+
+-   e.g. "Liberalism is the extent to which individuals support increased government spending for social programs"
+
+## Operationalizing concepts
+
+-   an *operational definition* describes the instrument to be used in measuring the concept and putting a conceptual definition "into operation"
+-   the conceptual definition should point the way toward constructing an operational definition
+-   e.g. liberalism is measured as a score of the number of times the respondent favored increasing government spending in a survey
+
+## Types of Measures
+
+-   nominal
+-   ordinal
+-   interval
+-   ratio
+
+## Measurement Error
+
+-   *systematic measurement error* introduces consistent, chronic distortion into an empirical measurement (i.e. *bias*)
+-   *random measurement error* introduces haphazard, chaotic distortion into the measurement process
+-   if you measure again, random error should be different, but systematic error will remain the same
+-   increasing sample size can help reduce random error, but NOT systematic error
+
+## Validity and Reliability of Measures
+
+-   *reliability* or *precision* refers to the degree to which a measure is consistent in measuring the concept
+-   *validity* refers to the degree to which the measure captures the "true" value of a characteristic
+-   If my measure repeatedly classifies Saudi Arabia as a democracy, it is reliable, but not valid.
 
 ## Populations and Samples
 
@@ -44,6 +154,8 @@ c\) `BES.csv`
 -   *Sample*: a subset of the population that we are able to measure (our dataset)
 -   *Observation*: a single unit from our sample (row in our dataset)
 -   *Variable*: measured attributes of each observation (columns in our dataset)
+
+# Describing a Variable
 
 ## Description
 
@@ -61,21 +173,7 @@ c\) `BES.csv`
 
     -   a sample that is *random* is often a good place to start in trying to achieve a sample that is *representative*
 
-    -   But, in elections, this is hard...
-
-## Potential Challenges
-
--   sampling frame
-
--   unit nonresponse
-
--   item nonresponse
-
--   misreporting
-
-# Tables in R
-
-## Loading Data
+## Loading Some Data
 
 1\) Check your working directory
 
@@ -111,8 +209,6 @@ table(bes$vote)
 prop.table(table(bes$vote))
 ```
 
-# Missing Data
-
 ## What's wrong here?
 
 ```{r}
@@ -136,12 +232,82 @@ mean(bes$leave, na.rm=T)
 
 ## Stop and Think!
 
--   I don't like the textbook's solution of deleting all missing data
+-   Don't ignore missing data
 -   You need to think about *why* data is missing
 -   What bias might you be introducing into the inferences you make about the population when you remove missing data from your sample?
 -   usually you will have to remove/ignore the missing data to proceed with analysis
 
-# Descriptive Statistics
+# Describing Data Visually
+
+## Boxplots
+
+```{r}
+library(ggplot2)
+boxplot(bes$age)
+```
+
+## Histogram
+
+-   a *histogram* is a graphical representation of a variable's distribution
+
+-   it is made of of "bins" of intervals of the variable on the x-axis (left-right)
+
+-   the y-axis (top-bottom) represents the number of observations of the variable within each "binned" interval
+
+## A Histogram of Respondent Age
+
+```{r}
+ggplot(bes, aes(x = age)) +
+  geom_histogram(color = "black", fill = "lightgray") + 
+  theme_bw()
+```
+
+## Density Histogram
+
+-   a histogram where the scale of the x-axis is adjusted so that the total "area" adds up to 1
+
+-   density of the bin = proportion of observations in the bin / width of the bin
+
+-   it's useful because we can compare to density histograms of other samples with different numbers of observations
+
+## A Density Histogram of Respondent Age
+
+```{r}
+
+ggplot(bes, aes(x = age)) +
+  geom_histogram(aes(y = after_stat(density)), color = "black", fill = "lightgray") + 
+  theme_bw()
+```
+
+## Density Plot
+
+-   take a density histogram and make the bin width smaller and smaller
+
+-   replace the bars with a curvy line
+
+-   the curvy line is such that the area beneath it sums to 1
+
+-   at any point along the x axis, the area under the line to the left represents the percentage of data less than that value of x
+
+## A Density Plot
+
+```{r}
+ggplot(bes, aes(x = age)) +
+  geom_histogram(aes(y = after_stat(density)), color = "black", fill = "lightgray") +
+  geom_density() + 
+  theme_bw()
+
+```
+
+## Just the Density
+
+```{r}
+ggplot(bes, aes(x = age)) +
+  geom_density() + 
+  theme_bw()
+```
+
+# Describing Data Statistically
 
 ## Central Tendency
 
@@ -175,47 +341,7 @@ sd(bes$age, na.rm=T)
 var(bes$age, na.rm=T)
 ```
 
-# Plotting Data
-
-## Boxplots
-
-```{r}
-
-boxplot(bes$age)
-```
-
-## Histogram
-
--   a *histogram* is a graphical representation of a variable's distribution
-
--   it is made of of "bins" of intervals of the variable on the x-axis (left-right)
-
--   the y-axis (top-bottom) represents the number of observations of the variable within each "binned" interval
-
-## A Histogram of Respondent Age
-
-```{r}
-
-hist(bes$age)
-```
-
-## Density Histogram
-
--   a histogram where the scale of the x-axis is adjusted so that the total "area" adds up to 1
-
--   density of the bin = proportion of observations in the bin / width of the bin
-
--   it's useful because we can compare to density histograms of other samples with different numbers of observations
-
-## A Density Histogram of Respondent Age
-
-```{r}
-
-hist(bes$age, freq= FALSE)
-```
-
 ## Wrap up
 
--   Thursday: Descriptive Statistics of 2 variables
--   Next week: Visualizing Data
--   Due next Friday: Data Camp `Tidyverse` unit (four chapters)
+-   Thursday: Theoretical Distributions and Descriptive Inference
+-   Due Friday: Data Camp `Hypothesis Testing in R` unit; Optional `Probability` unit
