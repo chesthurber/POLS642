@@ -600,19 +600,18 @@ Dr.&nbsp;Ches Thurber
 </section>
 <section id="probability-density-functions" class="slide level2">
 <h2>Probability Density Functions</h2>
-
-<img src="PDFs.png" alt="PDFs" width="400" class="r-stretch"><ul>
+<ul>
 <li><p>PDFs are mathematical functions that describe the relative probability of a continuous random variable</p></li>
 <li><p>You can use a PDF to calculate the probability of a value falling within a specific range</p></li>
 <li><p>these are <em>theoretical</em>: a way a variable could be distributed, not based on any observed sample of data</p></li>
 </ul>
 </section>
-<section class="slide level2">
+<section id="pdf-examples" class="slide level2">
+<h2>PDF Examples</h2>
 
-</section></section>
-<section>
-<section id="the-normal-distribution" class="title-slide slide level1 center">
-<h1>The Normal Distribution</h1>
+<img src="PDFs.png" alt="PDFs" width="400" class="r-stretch"></section>
+<section id="the-normal-distribution" class="slide level2">
+<h2>The Normal Distribution</h2>
 
 <img src="Normal.svg" alt="PDFs" width="600" class="r-stretch"><ul>
 <li>a specific PDF that is symmetrical and in which 95 percent of outcomes fall within 2 standard deviations from the mean.</li>
@@ -627,24 +626,27 @@ Dr.&nbsp;Ches Thurber
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href=""></a>coin_flips <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(<span class="at">n =</span> <span class="dv">100000</span>, <span class="at">size=</span><span class="dv">6</span>, <span class="at">prob =</span> .<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>.pull-left[</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href=""></a><span class="fu">hist</span>(coin_flips)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 </div>
-<img data-src="W2L2_Theoretical-Distributions_files/figure-revealjs/coin%20histogram-1.png" style="width:70.0%" class="r-stretch"><p>]</p>
-<p>.pull-right[</p>
+<img data-src="W2L2_Theoretical-Distributions_files/figure-revealjs/coin%20histogram-1.png" style="width:70.0%" class="r-stretch"></section>
+<section id="using-a-pdf" class="slide level2">
+<h2>Using a PDF</h2>
+<ul>
+<li><p>We can use the PDF to calculate the probability of specific events</p></li>
+<li><p>e.g.&nbsp;What is the probability of flipping heads six times in a row?</p></li>
+</ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href=""></a><span class="fu">sum</span>(coin_flips<span class="sc">==</span><span class="dv">6</span>)<span class="sc">/</span><span class="dv">100000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.01564</code></pre>
+<pre><code>[1] 0.01516</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href=""></a><span class="fu">dbinom</span>(<span class="at">x=</span><span class="dv">6</span>, <span class="at">size=</span><span class="dv">6</span>, <span class="at">prob=</span><span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.015625</code></pre>
 </div>
 </div>
-<p>]</p>
 </section>
 <section id="from-probability-to-inference" class="slide level2">
 <h2>From Probability to Inference</h2>

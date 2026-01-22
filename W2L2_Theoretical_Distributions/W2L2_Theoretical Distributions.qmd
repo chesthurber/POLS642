@@ -178,7 +178,7 @@ ggplot(bes, aes(x = age)) +
 
 ## Probability Density Functions
 
-<img src="PDFs.png" alt="PDFs" width="400"/>
+
 
 - PDFs are mathematical functions that describe the relative probability of a continuous random variable
 
@@ -186,9 +186,12 @@ ggplot(bes, aes(x = age)) +
 
 - these are *theoretical*: a way a variable could be distributed, not based on any observed sample of data
 
----
+## PDF Examples
 
-# The Normal Distribution
+<img src="PDFs.png" alt="PDFs" width="400"/>
+
+## The Normal Distribution
+
 <img src="Normal.svg" alt="PDFs" width="600"/>
 
 - a specific PDF that is symmetrical and in which 95 percent of outcomes fall within 2 standard deviations from the mean.
@@ -199,21 +202,26 @@ ggplot(bes, aes(x = age)) +
 - the distribution of bivariate outcomes with probability $\pi$
 - approximates the normal distribution as size gets large
 
+
 ```{r, coin flips}
 coin_flips <- rbinom(n = 100000, size=6, prob = .5)
 ```
-.pull-left[
+
 ```{r, coin histogram, out.width = '70%'}
 hist(coin_flips)
 ```
-]
 
-.pull-right[
+
+## Using a PDF
+
+- We can use the PDF to calculate the probability of specific events
+
+- e.g. What is the probability of flipping heads six times in a row?
+
 ```{r, coin calculations}
 sum(coin_flips==6)/100000
 dbinom(x=6, size=6, prob=0.5)
 ```
-]
 
 
 ## From Probability to Inference
