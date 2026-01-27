@@ -1,0 +1,229 @@
+---
+title: "W3L1: Hypothesis Testing"
+subtitle: "POLS 642 Intermediate Analysis of Political Data"
+author: "Dr. Ches Thurber"
+format: 
+  revealjs:
+    theme: simple
+execute: 
+  echo: true
+editor: visual
+---
+
+## Get Started
+
+1\) Follow link on Blackboard to download `W3L1_Hypothesis_Testing.zip`
+
+2\) "Unzip" it and get the files set up in your file directory the way you want them
+
+3\) Open up your R Project
+
+## Plan for Today
+
+1\) The Challenge of Inference
+
+# The Challenge of Inference
+
+## Populations and Samples
+
+-   *Population*: all of some unit of analysis that exists (or could exist)
+-   *Sample*: a subset of the population that we are able to measure (our dataset)
+-   *Observation*: a single unit from our sample (row in our dataset)
+-   *Variable*: measured attributes of each observation (columns in our dataset)
+
+## Descriptive Inference
+
+-   Descriptive Inference: estimate the characteristics of the *population* based on the *sample*
+
+-   We have in our hands a *sample*, we can calculate descriptive statistics, plot its distribution, etc...
+
+-   But what we really want to know about is the *population*
+
+## Core Problem
+
+-   we can know the probability of a model/distribution producing a certain outcome
+    -   i.e. if we know the distribution of the population, we can calculate the probability of drawing any given sample
+    -   e.g. "The probability of flipping a fair coin heads twice in a row is .25"
+-   we cannot know the probability of a model being true given an outcome
+    -   i.e. if we have a sample, we can NOT know the population it was drawn from
+    -   e.g. "Heads came up twice in a row: what's the probability that it's fair?"
+
+## What to do?
+
+-   We can take a theoretical distribution (a hypothetical population) and ask "what is the probability that a sample taken from this distribution would look like our sample?"
+
+-   if the probability of drawing a sample that looks like ours from the theoretical distribution is reasonably likely, we accept that the theoretical distribution might be a plausible model of the distribution of the population
+
+-   but if the probability of drawing a sample that looks like ours from the theoretical distribution is highly unlikely, we reject the theoretical distribution as a possible model of the population
+
+## Theoretical and Sample Distributions
+
+\![\](<https://theeffectbook.net/the-effect_files/figure-html/describingvariables-approachlimit-1.png>)
+
+## Two Tasks
+
+1\) We need some kind of theoretical distribution that we think is a useful hypothetical population
+
+2\) We need some way of deciding whether our sample looks enough like that distribution or not
+
+## Probability Density Functions
+
+-   PDFs are mathematical functions that describe the relative probability of a continuous random variable
+
+-   You can use a PDF to calculate the probability of a value falling within a specific range
+
+-   these are *theoretical*: a way a variable could be distributed, not based on any observed sample of data
+
+## PDF Examples
+
+<img src="PDFs.png" alt="PDFs" width="400"/>
+
+## The Normal Distribution
+
+<img src="Normal.svg" alt="PDFs" width="600"/>
+
+-   a specific PDF that is symmetrical and in which 95 percent of outcomes fall within 2 standard deviations from the mean.
+
+## The Binomial Distribution
+
+-   the distribution of bivariate outcomes with probability $\pi$
+-   approximates the normal distribution as size gets large
+
+```{r, coin flips}
+coin_flips <- rbinom(n = 100000, size=6, prob = .5)
+```
+
+```{r, coin histogram, out.width = '70%'}
+hist(coin_flips)
+```
+
+## Flipping Coins
+
+Flip one coin:
+
+```{r}
+rbinom(n=1, size = 1, prob = .5)
+```
+
+Flip a coin six times:
+
+```{r}
+rbinom(n=6, size = 1, prob = .5)
+```
+
+Flip six coins at once:
+
+```{r}
+rbinom(n=1, size = 6, prob = .5)
+```
+
+## Simulation
+
+What are the odds of flipping a coin six times and having them all be heads?
+
+I could flip six coins LOTS of times and see what percentage of times they are all heads:
+
+```{r}
+coin_flips <- rbinom(n = 100000, size=6, prob = .5)
+sum(coin_flips==6)/100000
+```
+
+## Using a PDF
+
+Or, knowing that coin flips follow a binomial distribution with $\pi$ = 0.5, I can calculate the probability of flipping six heads in a row:
+
+```{r, coin calculations}
+
+.5*.5*.5*.5*.5*.5
+
+dbinom(x=6, size=6, prob=0.5)
+```
+
+# Hypothesis Testing
+
+## Two Tasks
+
+1\) We need some kind of theoretical distribution that we think is a useful hypothetical population...DONE!
+
+2\) We need some way of deciding whether our sample looks enough like that distribution or not ... Not Done...
+
+## Hypothesis Testing approach
+
+-   establish **null hypothesis** of what a core characteristic of the theoretical distribution of the population might be (e.g. its mean or its $\pi$)
+
+-   calculate probability of drawing a sample from the null hypothesis's theoretical distribution with core characteristic of your observed sample
+
+-   reject the null hypothesis when the probability of drawing a sample with the observed characteristic as extreme as yours is small (often $\alpha = 0.05$)
+
+## Hypothesis testing the Coin flip
+
+-   **Null Hypothesis**: The coin is "fair" (i.e. the population distribution is binomial with $\pi$ = 0.5)
+
+-   **Alternative Hypothesis**: The coin is not fair (i.e. $\pi \neq .5$)
+
+```{r, six flips}
+dbinom(x=6, size=6, prob=0.5)
+```
+
+-   Because .016 \< .05, we reject the null, and accept the alternative hypothesis: Thurber is a liar!
+
+# Polling
+
+## Let's Look at Today's Rasmussen Poll
+
+-   1500 respondents
+
+-   46% approve of Trump
+
+-   52% disapprove
+
+## Hypothesis Testing of the Poll
+
+**Null Hypothesis:**
+
+**Alternative Hypothesis:**
+
+## Calculating the Test
+
+What's the probability of getting a 46% approval rating with a sample size of 1500 under the conditions of the null?
+
+```{r}
+2 * pbinom(.46*1500, 1500, .5)
+```
+
+Can we reject the null?
+
+# Confidence Interval
+
+## Problems with the Hypothesis Testing Approach
+
+## A Different Way
+
+-   What if, instead of asking whether or not our sample is a reasonably likely outcome from one specific theoretical distribution, we asked, "What is the range of theoretical distributions from which our sample is a reasonably likely outcome?"
+
+-   To put it differently, "what is the set of null hypotheses that we would fail to reject?"
+
+-   What are the values of $\pi$ for which our observed sample rate has at least a 2.5% probability
+
+## Calculating the Bounds
+
+What is the lowest actual Trump approval rating for which 46% still has a 2.5% chance of occurring?
+
+What is the highest actual Trump approval rating for which 46% still has a 2.5% chance of occurring?
+
+```{r}
+
+qbinom(.025, 1500, .46) /1500
+
+qbinom(.975, 1500, .46) /1500
+```
+
+Our sample of 46% approval is reasonably likely if the actual population $\pi$ of people who support Trump is anywhere between 43.5% and 48.5% (i.e. $\pm$ 2.5%)
+
+## Spot Check
+
+```{r}
+
+pbinom(.46*1500, 1500, .435)
+pbinom(.46*1500, 1500, .485)
+```
