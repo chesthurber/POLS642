@@ -569,7 +569,7 @@ Dr.&nbsp;Ches Thurber
 <h2>Distribution of Sample Means</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a>sample_means <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="dv">1000</span>,</span>
-<span id="cb12-2"><a href=""></a>                          <span class="fu">mean</span>(<span class="fu">sample</span>(BES<span class="sc">$</span>age, <span class="at">size =</span> <span class="dv">100</span>, <span class="at">replace =</span> F), <span class="at">na.rm=</span>T))</span>
+<span id="cb12-2"><a href=""></a>                          <span class="fu">mean</span>(<span class="fu">sample</span>(BES<span class="sc">$</span>age, <span class="at">size =</span> <span class="dv">1000</span>, <span class="at">replace =</span> F), <span class="at">na.rm=</span>T))</span>
 <span id="cb12-3"><a href=""></a><span class="fu">hist</span>(sample_means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 </div>
@@ -607,7 +607,7 @@ Dr.&nbsp;Ches Thurber
 </div>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href=""></a><span class="fu">mean</span>(sample_means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 50.77315</code></pre>
+<pre><code>[1] 50.75061</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href=""></a><span class="fu">sd</span>(BES<span class="sc">$</span>age)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -619,7 +619,7 @@ Dr.&nbsp;Ches Thurber
 </div>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href=""></a><span class="fu">sd</span>(sample_means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1.671393</code></pre>
+<pre><code>[1] 0.5080795</code></pre>
 </div>
 </div>
 </section>
@@ -811,7 +811,7 @@ Dr.&nbsp;Ches Thurber
 <section id="test-statistic-for-comparing-two-means" class="slide level2">
 <h2>Test Statistic for comparing two means</h2>
 <ul>
-<li>test statistic: <span class="math display">\[ \frac{t_1 - t_2}{\sqrt{\frac{s_1^2}{n} + \frac{s_2^2}{n}}} \]</span></li>
+<li>test statistic: <span class="math display">\[ \frac{\bar{x}_1 - \bar{x}_2}{\sqrt{\frac{s_1^2}{n_1} + \frac{s_2^2}{n_2}}} \]</span></li>
 </ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href=""></a>t.top <span class="ot">&lt;-</span> mean.stay<span class="sc">-</span>mean.leave</span>
@@ -821,6 +821,9 @@ Dr.&nbsp;Ches Thurber
 <pre><code>[1] -40.09589</code></pre>
 </div>
 </div>
+<ul>
+<li>the difference in means divided by the joint standard error (accounting for the fact that there are differences in variance and size between the samples)</li>
+</ul>
 </section>
 <section id="calculate-p-value" class="slide level2">
 <h2>Calculate P-value</h2>

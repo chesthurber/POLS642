@@ -155,7 +155,7 @@ hist(BES$age)
 
 ```{r}
 sample_means <- replicate(1000,
-                          mean(sample(BES$age, size = 100, replace = F), na.rm=T))
+                          mean(sample(BES$age, size = 1000, replace = F), na.rm=T))
 hist(sample_means)
 ```
 
@@ -353,13 +353,15 @@ se.leave
 
 ## Test Statistic for comparing two means
 
--   test statistic: $$ \frac{t_1 - t_2}{\sqrt{\frac{s_1^2}{n} + \frac{s_2^2}{n}}} $$
+-   test statistic: $$ \frac{\bar{x}_1 - \bar{x}_2}{\sqrt{\frac{s_1^2}{n_1} + \frac{s_2^2}{n_2}}} $$
 
 ```{r}
 t.top <- mean.stay-mean.leave
 t.bottom <- sqrt(((s.stay^2)/n.stay) + ((s.leave^2)/n.leave))
 t.top/t.bottom
 ```
+
+-   the difference in means divided by the joint standard error (accounting for the fact that there are differences in variance and size between the samples)
 
 ## Calculate P-value
 
