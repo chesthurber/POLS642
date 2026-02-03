@@ -1,0 +1,297 @@
+---
+title: "W4L1: OLS Regression"
+subtitle: "POLS 642 Intermediate Analysis of Political Data"
+author: "Dr. Ches Thurber"
+format: 
+  revealjs:
+    theme: simple
+execute: 
+  echo: true
+editor: visual
+---
+
+## Big Picture
+
+-   Today: Fitting Regressions
+
+-   Thur: Hypothesis Testing Regressions
+
+-   Fri: Data Camp - Intro to Regression
+
+-   Next Week: Interactions and Logits
+
+## Plan for Today
+
+1\) Recap
+
+2\) Regression
+
+3\) Ordinary Least Squares
+
+4\) Calculating the Line of Best Fit
+
+## Packages
+
+```{r}
+library(gapminder)
+library(dplyr)
+library(ggplot2)
+```
+
+# Recap
+
+## What We've Done So Far
+
+-   Describing a single variable from a sample
+
+-   Making inferences about the population from the sample
+
+-   Two variables: Examining conditional means within the sample
+
+-   Making inferences about conditional means in the population from the sample
+
+## Comparing Two Continuous Variables
+
+```{r, echo = F}
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp))+
+    geom_point(mapping = aes(color = continent)) +
+    scale_x_log10(labels=scales::dollar) +
+  labs(x = "GDP Per Capita", y = "Life Expectancy in Years",
+         title = "Economic Development and Life Expectancy by Continent",
+         subtitle = "Data points are country-years",
+         caption = "Source: Gapminder.",
+       color= "Continent") + 
+  theme_bw()
+```
+
+## Is Life Expectancy Different in Asia than Africa?
+
+-   what's the null hypothesis?
+
+-   what's the alternative hypothesis?
+
+-   explain the following
+
+```{r}
+t.test(gapminder$lifeExp[gapminder$continent=="Asia"], gapminder$lifeExp[gapminder$continent=="Africa"])
+```
+
+## Is Life Expectancy Higher in Richer Countries?
+
+```{r, echo = F, warning = F}
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp))+
+    geom_point() +
+    scale_x_log10(labels=scales::dollar) +
+  geom_smooth(method = "lm") +
+  labs(x = "GDP Per Capita", y = "Life Expectancy in Years",
+         title = "Economic Development and Life Expectancy by Continent",
+         subtitle = "Data points are country-years",
+         caption = "Source: Gapminder.") + 
+  theme_bw()
+```
+
+## What We're Going to Do
+
+1\) Set up a null hypothesis that the slope of the line linking X and Y is 0
+
+2\) Calculate the line of best fit (Today) for our sample
+
+3\) Make an inference about what that line might or might not look like for the population
+
+# Regression
+
+## Our Key Model: Regression
+
+Can we write an algebraic equation that predicts $Y$ given $X$?
+
+$\hat{Y_i} = \hat{\beta_0} + \hat{\beta_1} X_i + \epsilon_i$
+
+-   $\hat{Y_i}$ = our prediction of the value of the dependent variable/outcome variable, the thing we want to predict
+
+-   $X_i$ = independent variable/explanatory variable/predictor
+
+## More parts of the model
+
+Can we write an algebraic equation that predicts $Y$ given $X$?
+
+$\hat{Y_i} = \hat{\beta_0} + \hat{\beta_1} X_i + \epsilon_i$
+
+-   $\hat{\beta_0}$ or $\hat{\alpha}$ : the intercept (predicted value of $\hat{Y}$ when $X$ = 0.
+
+-   $\hat{\beta_1}$ : the slope, how much $\hat{Y}$ changes for every one unit increase in $X$
+
+-   $\epsilon_i$ = the error term, the part of the DV our IV doesn't explain, the difference between what our equation predicts and the actual observations
+
+## More notation
+
+-   the little "hats" mean that we are talking about a value that we "estimate" using algebra or calculus, as opposed to a number that exists already in our data
+
+-   the little "i"s mean that we are talking about each individual observation
+
+-   So $\hat{Y_i}$ is our estimate of the outcome variable based on the observed value of $X_i$ and our estimates of $\hat{\beta_0}$ and $\hat{\beta_1}$
+
+-   $\epsilon_i$ is the difference between our estimated value $\hat{Y_i}$ and the observed value of $Y_i$
+
+## Linear Regression: the Goal
+
+-   let's create the line equation that best fits the data
+
+-   let's write an equation that allows us to do the best job of predicting Y based on X
+
+-   let's solve for the the slope $\hat{\beta_1}$ and the intercept $\hat{\beta_0}$ such that we minimize the error $\epsilon$
+
+# Ordinary Least Squares
+
+## Best Fitting Line
+
+![](scatter_ols_res.jpg){width="400"}
+
+## Residuals and SSE
+
+![](scatter_ols_res.jpg){width="400"}
+
+-   The *residual*, or the error $\epsilon_i$ is the vertical distance between the line and any given point.
+-   The Sum Squared Error (SSE) takes those errors/ residuals, squares them, and adds them up.
+-   The lower the SSE, the better the fit of the line to the data
+
+## Calculating SSE
+
+We can calculate the Sum of Squared Errors or Sum of Squared Residuals as: $$SSE = \sum_{i=1}^n \epsilon_i^2 = \sum_{i=1}^n (Y_i - \hat \beta_0 - \hat \beta_1 X_i)^2$$
+
+## Compare to this
+
+![](scatter_ols_wrong2.jpg){width="400"}
+
+-   This is a pretty terrible fit.
+-   Sum of squared errors (SSR) is larger: 259 compared to 39
+
+## And this
+
+![](scatter_ols_wrong3.jpg){width="400"}
+
+-   This is not totally unreasonable, but could be improved
+-   SSR=62, not as bad as last one, but not as good as 39.
+
+## Let's go back to the best fit
+
+![](scatter_ols_res.jpg){width="400"}
+
+We want the line that produces the lowest possible SSR
+
+## Our Key Model
+
+$$\hat{Y_i} = \hat{\beta_0} + \hat{\beta_1} X_i + \epsilon_i$$
+
+-   we can use calculus to find the values of $\hat{\beta_1}$ and $\hat{\beta_0}$ that minimize SSR
+
+## Ordinary Least Squares
+
+Recall our expression for SSR: $$\sum_{i=1}^n (Y_i - \hat \beta_0 - \hat \beta_1 X_i)^2$$
+
+We want to minimize this, so we take the derivative and set equal to zero, then divide both sides by two...oh screw it!
+
+## Here's what you end up with
+
+Estimator for the coefficient: $$\hat \beta_1 = \frac{
+\sum_{i=1}^n (X_i-\bar X)(Y_i-\bar Y)}{\sum_{i=1}^n (X_i - \bar X)^2}$$
+
+Estimator for the intercept: $$\hat \beta_0 = \overline Y - \hat \beta_1 \overline X$$
+
+# Calculating the Line of Best Fit
+
+## Step 1:
+
+$$\hat \beta_1 = \frac{
+\sum_{i=1}^n (X_i-\bar X)(Y_i-\bar Y)}{\sum_{i=1}^n (X_i - \bar X)^2}$$
+
+Let's start by creating a column in our dataset for that first part in the numerator: $X_i - \bar{X}$
+
+```{r}
+gapminder <- gapminder %>%
+mutate(GDPpc_meandiffs = gdpPercap - mean(gdpPercap))
+```
+
+## Step 2:
+
+$$\hat \beta_1 = \frac{
+\sum_{i=1}^n (X_i-\bar X)(Y_i-\bar Y)}{\sum_{i=1}^n (X_i - \bar X)^2}$$
+
+Next, create a column in our dataset for that second part in the numerator: $Y_i - \bar{Y}$
+
+```{r}
+gapminder <- gapminder %>%
+mutate(GDPpc_meandiffs = gdpPercap - mean(gdpPercap),
+       lifeExp_meandiffs = lifeExp-mean(lifeExp))
+```
+
+## Step 3:
+
+$$\hat \beta_1 = \frac{
+\sum_{i=1}^n (X_i-\bar X)(Y_i-\bar Y)}{\sum_{i=1}^n (X_i - \bar X)^2}$$
+
+Create a column multiplying those two parts of the numerator together: $(X_i - \bar{X}) * (Y_i - \bar{Y})$
+
+```{r}
+
+gapminder <- gapminder %>%
+mutate(GDPpc_meandiffs = gdpPercap - mean(gdpPercap),
+       lifeExp_meandiffs = lifeExp-mean(lifeExp),
+       numerator = GDPpc_meandiffs * lifeExp_meandiffs)
+```
+
+## Step 4:
+
+$$\hat \beta_1 = \frac{
+\sum_{i=1}^n (X_i-\bar X)(Y_i-\bar Y)}{\sum_{i=1}^n (X_i - \bar X)^2}$$
+
+Create a column for the denominator, squaring the difference from means for prior GDP from Step 1: $(X_i - \bar{X})^2$
+
+```{r}
+gapminder <- gapminder %>%
+mutate(GDPpc_meandiffs = gdpPercap - mean(gdpPercap),
+       lifeExp_meandiffs = lifeExp-mean(lifeExp),
+       numerator = GDPpc_meandiffs * lifeExp_meandiffs,
+       denominator = GDPpc_meandiffs^2)
+```
+
+## Step 5:
+
+$$\hat \beta_1 = \frac{
+\sum_{i=1}^n (X_i-\bar X)(Y_i-\bar Y)}{\sum_{i=1}^n (X_i - \bar X)^2}$$
+
+Put it all together! Take the numerator column
+
+sum and divide by the denominator column sum. That's our slope!
+
+```{r}
+
+slope <- sum(gapminder$numerator)/sum(gapminder$denominator)
+slope
+```
+
+## Calculate the intercept
+
+$$\hat \beta_0 = \bar Y - \hat \beta_1 \bar X$$
+
+This is pretty straightforward: we just need our slope, the means, and to pay attention to the order of operations.
+
+```{r}
+
+intercept <- mean(gapminder$lifeExp) - (slope * mean(gapminder$gdpPercap))
+intercept
+```
+
+## Check our work
+
+```{r}
+
+our_model <- lm(lifeExp ~ gdpPercap, data = gapminder)
+our_model
+
+```
+
+-   Interpreting intercept: "When pcGDP is 0, our estimate for life expectancy is is 54"
+
+-   Interpreting slope: "For every 1 unit (\$) increase in pcGDP, we predict a .00076 year increase in life expectancy"
+
+-   If a country had a pcGDP of \$10,000, what would we expect the life expectancy to be?
