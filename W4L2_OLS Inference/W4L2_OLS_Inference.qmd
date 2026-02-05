@@ -1,0 +1,226 @@
+---
+title: "W4L2: Inference with OLS"
+subtitle: "POLS 642 Intermediate Analysis of Political Data"
+author: "Dr. Ches Thurber"
+format: 
+  revealjs:
+    theme: simple
+execute: 
+  echo: true
+editor: visual
+---
+
+## Plan for Today
+
+1\) Recap of Inference
+
+2\) Recap of Regression
+
+## Packages
+
+```{r}
+library(gapminder)
+library(dplyr)
+library(ggplot2)
+gapminder <- gapminder
+```
+
+# Recap of Inference
+
+## Single Variable - Known Distribution
+
+-   Here's our sample, let's look at one variable
+
+-   e.g. % of people who support Trump
+
+-   what can we say about the % of people who support Trump in the population?
+
+-   Use binomial distribution to calculate confidence intervals and hypothesis tests
+
+## Single Variable - Unknown Distribution
+
+-   What if we don't know the distribution of the population? e.g. voter ages
+
+-   No problem, because of the Central Limit Theorem, we know that distribution of sample means will follow a normal distribution, centered at the population mean and with standard error of $\frac{\sigma}{\sqrt{n}}$
+
+-   Don't know $\sigma$? No problem, substitute the sample standard deviation and use the t-distribution to account for this increased uncertainty
+
+-   Calculate confidence intervals or hypothesis tests as before
+
+## Two Variables - Conditional Means
+
+-   What if we want to compare means across two groups? e.g. voter ages for leave vs. stay?
+
+-   again we can use the t-distribution to model the theoretical distribution of the difference in means between two groups ( $\bar{x_1} - \bar{x_2}$)
+
+-   conduct a hypothesis test (i.e. difference in means = 0) or calculate confidence interval
+
+## Moving Forward - Regression
+
+-   when we calculate a slope from a regression ($\hat{\beta_1}$) based on our sample, what does it tell us about the slope within the total population ($\beta_1$)?
+
+-   like sample means, regression slopes from infinite samples will follow a t-distribution
+
+-   just like in all the previous examples, we can use that theoretical distribution to make inferences about the range of (un)likely population parameters/slopes
+
+# Regression Recap
+
+## Our Key Model: Regression
+
+$\hat{Y_i} = \hat{\beta_0} + \hat{\beta_1} X_i$
+
+$Y_i = \hat{Y_i} + \epsilon_i$
+
+${Y_i} = \hat{\beta_0} + \hat{\beta_1} X_i + \epsilon_i$
+
+-   ${Y_i}$ = the actual value of Y in our dataset
+
+-   $\hat{Y_i}$ = our prediction of the value of the dependent variable/outcome variable
+
+-   $X_i$ = independent variable/explanatory variable/predictor
+
+## More parts of the model
+
+${Y_i} = \hat{\beta_0} + \hat{\beta_1} X_i + \epsilon_i$
+
+-   $\hat{\beta_0}$ or $\hat{\alpha}$ : the intercept (predicted value of $\hat{Y}$ when $X$ = 0.
+
+-   $\hat{\beta_1}$ : the slope, how much $\hat{Y}$ changes for every one unit increase in $X$
+
+-   $\epsilon_i$ = the error term, the part of the DV our IV doesn't explain, the difference between what our equation predicts and the actual observations
+
+## More notation
+
+-   the little "hats" mean that we are talking about a value that we "estimate" using algebra or calculus, as opposed to a number that exists already in our data
+
+-   the little "i"s mean that we are talking about each individual observation
+
+-   So $\hat{Y_i}$ is our estimate of the outcome variable based on the observed value of $X_i$ and our estimates of $\hat{\beta_0}$ and $\hat{\beta_1}$
+
+-   $\epsilon_i$ is the difference between our estimated value $\hat{Y_i}$ and the observed value of $Y_i$
+
+## Linear Regression: the Goal
+
+-   let's create the line equation that best fits the data
+
+-   let's write an equation that allows us to do the best job of predicting Y based on X
+
+-   let's solve for the the slope $\hat{\beta_1}$ and the intercept $\hat{\beta_0}$ such that we minimize the error $\epsilon$
+
+## Ordinary Least Squares
+
+Recall our expression for SSR: $$\sum_{i=1}^n (Y_i - \hat \beta_0 - \hat \beta_1 X_i)^2$$
+
+We want to minimize this, so we take the derivative and set equal to zero, then divide both sides by two...oh screw it!
+
+## Here's what you end up with
+
+Estimator for the coefficient: $$\hat \beta_1 = \frac{
+\sum_{i=1}^n (X_i-\bar X)(Y_i-\bar Y)}{\sum_{i=1}^n (X_i - \bar X)^2}$$
+
+Estimator for the intercept: $$\hat \beta_0 = \overline Y - \hat \beta_1 \overline X$$
+
+## Regression the Easy Way
+
+```{r}
+gap.model <- lm(lifeExp~gdpPercap, data = gapminder)
+gap.model
+```
+
+-   Interpreting intercept: "When pcGDP is 0, our estimate for life expectancy is is 54"
+
+-   Interpreting slope: "For every 1 unit (\$) increase in pcGDP, we predict a .00076 year increase in life expectancy"
+
+-   If a country had a pcGDP of \$10,000, what would we expect the life expectancy to be?
+
+## BUT
+
+-   if we had a different sample of countries, would we see the same relationship between GDP and life Expectancy?
+
+-   how much might we expect the observed relationship (i.e. slope, $\hat{\beta_1}$ ) to vary from sample to sample?
+
+-   If there were no relationship in the population (i.e. $\beta_1$ = 0), what is the probability of drawing a sample of 1704 observations with a $\hat{\beta_1}$ = 0.00076?
+
+# Inference with Regression
+
+## Let's Draw a Sample
+
+-   let's pretend the gapminder dataset represents a population
+
+-   let's pull out a random sample of 100 observations and run a regression
+
+    ```{r}
+    sample1 <- sample_n(gapminder, 100)
+    model1 <- lm(lifeExp~gdpPercap, data = sample1)
+    model1
+    ```
+
+## Let's try again
+
+```{r}
+
+sample2 <- sample_n(gapminder, 100)
+model2 <- lm(lifeExp~gdpPercap, data = sample2)
+model2
+```
+
+## Let's do it a lot!
+
+```{r}
+coef_results <- data.frame(intercept = numeric(1000), gdpPercap = numeric(1000))
+for (i in 1:1000){
+  sample <- sample_n(gapminder, 300)
+  model <- lm(lifeExp~log(gdpPercap), data = sample)
+  coef_results[i,] <- coef(model)
+}
+head(coef_results)
+```
+
+## Histogram
+
+```{r}
+hist(coef_results$gdpPercap)
+```
+
+## Summary Statistics
+
+```{r}
+mean(coef_results$gdpPercap)
+```
+
+```{r}
+sd(coef_results$gdpPercap)
+```
+
+```{r}
+quantile(coef_results$gdpPercap, .025)
+```
+
+## Calculating the variance of our coefficient?
+
+We can calculate variance and standard error of $\hat \beta_1$
+
+Variance of the Regression:
+
+$$\hat{\sigma} ^2 = \frac{\sum_{i=1}^N (Y_i - \hat Y_i)^2}{N-k}$$
+
+Variance of Coefficient:
+
+$$var(\hat \beta_1) = \frac{\hat {\sigma} ^2}{N * var(X)}$$
+
+# *What affects the variance of the coefficients?*
+
+## Putting it together in R
+
+```{r}
+summary(model)
+```
+
+## The "True" Model
+
+```{r}
+gap.model2 <- lm(lifeExp~log(gdpPercap), data = gapminder)
+summary(gap.model2)
+```
+
+# 
