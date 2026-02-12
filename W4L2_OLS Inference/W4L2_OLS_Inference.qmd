@@ -170,7 +170,7 @@ model2
 coef_results <- data.frame(intercept = numeric(1000), gdpPercap = numeric(1000))
 for (i in 1:1000){
   sample <- sample_n(gapminder, 300)
-  model <- lm(lifeExp~log(gdpPercap), data = sample)
+  model <- lm(lifeExp~gdpPercap, data = sample)
   coef_results[i,] <- coef(model)
 }
 head(coef_results)
@@ -224,3 +224,12 @@ summary(gap.model2)
 ```
 
 # 
+
+```{r}
+plot(gapminder$lifeExp~gapminder$gdpPercap)
+```
+
+```{r}
+gapminder$logpcGDP <- log(gapminder$gdpPercap)
+plot((gapminder$lifeExp~gapminder$logpcGDP))
+```
