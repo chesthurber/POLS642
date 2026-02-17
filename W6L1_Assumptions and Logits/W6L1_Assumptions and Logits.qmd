@@ -1,5 +1,5 @@
 ---
-title: "W5: Binary Variables"
+title: "W6L1: Assumptions and Logits"
 subtitle: "POLS 642 Intermediate Analysis of Political Data"
 author: "Dr. Ches Thurber"
 format: 
@@ -12,15 +12,19 @@ editor: visual
 
 ## Plan for Today
 
-1\) Transformations
+1\) Telling Bad Stories
 
-2\) Binary IVs
+2\) OLS Assumptions
 
-3\) Interactions
-
-4\) Categorical IVs
+3\) Recap: Binary IVs, Interactions, and Categorical Variables
 
 4\) Binary DVs
+
+## Planning Ahead
+
+-   Friday 2/27: Problem Set #1 Due
+
+-   Thur 3/5: Midterm Exam
 
 ## Packages
 
@@ -31,30 +35,13 @@ library(ggplot2)
 gapminder <- gapminder
 ```
 
-# Transformations
-
-## Regression the Easy Way
-
-```{r}
-gap.model <- lm(lifeExp~gdpPercap, data = gapminder)
-gap.model
-```
-
--   Interpreting intercept: "When pcGDP is 0, our estimate for life expectancy is is 54"
-
--   Interpreting slope: "For every 1 unit (\$) increase in pcGDP, we predict a .00076 year increase in life expectancy"
-
--   If a country had a pcGDP of \$10,000, what would we expect the life expectancy to be?
-
-## The Full Output
-
-```{r}
-summary(gap.model)
-```
+# Telling Bad Stories
 
 ## Oops
 
 ```{r, echo = F, warning = F}
+
+gap.model <- lm(lifeExp~gdpPercap, data = gapminder)
 ggplot(gapminder, aes(x = gdpPercap, y = lifeExp))+
     geom_point() +
   geom_smooth(method = "lm", formula = y ~ x) +
@@ -66,62 +53,43 @@ ggplot(gapminder, aes(x = gdpPercap, y = lifeExp))+
 
 ```
 
-## Let's make our line bend
+## Problem #1
 
--   how do we draw a graph of curve in algebra?
+-   Our model does not tell a very good story about our data
 
-    ![](https://d20khd7ddkh5ls.cloudfront.net/graphs_expressions.png)
+## Problem #2
 
-## Squared Term
+-   Our model violates the assumptions of OLS regression
+
+-   Specifically, violates assumptions that make the central limit theorem as applied to regression no longer hold
+
+    -   i.e. That if we took infinite samples from the data and ran regressions on each of those samples, the distribution of our calculated slopes ($\hat \beta_1$) would follow a normal distribution with a mean of the population $\beta_1$ and a standard deviation of $\frac{\hat {\sigma} ^2}{N * var(X)}$
+
+## This Is Not Normal
+
+```{r echo=FALSE}
+coef_results <- data.frame(intercept = numeric(1000), gdpPercap = numeric(1000))
+for (i in 1:1000){
+  sample <- sample_n(gapminder, 300)
+  model <- lm(lifeExp~gdpPercap, data = sample)
+  coef_results[i,] <- coef(model)
+}
+```
 
 ```{r}
-gap.model.sq <- lm(lifeExp~I(gdpPercap^2) + gdpPercap, data = gapminder)
-summary(gap.model.sq)
+hist(coef_results$gdpPercap)
 ```
 
-## Visualizing the Polynomial
+## Solutions
 
-```{r, echo = F, warning = F}
-ggplot(gapminder, aes(x = gdpPercap, y = lifeExp))+
-    geom_point() +
-  geom_smooth(method = "lm", formula = y ~ I(x^2)+x) +
-  labs(x = "GDP Per Capita", y = "Life Expectancy in Years",
-         title = "Economic Development and Life Expectancy",
-         subtitle = "Data points are country-years",
-         caption = "Source: Gapminder.") + 
-  theme_bw()
-```
+1\) Build a better model
 
-## Notes About Polynomials
+2\) Adjust your standard errors
 
--   use when you have a theoretical reason to think there might be a U or upside-down U relationship
-
--   always include both the squared and the non-squared term
-
--   it's possible to have a cubed term...but rarely makes sense
-
--   do not try to interpret the coefficients individually...just graph it
-
-## Logarithmic Transformations
-
--   Log_10: Transforms 10, 100, 1000 into 1, 2, 3
-
--   Ln = "natural log," it just has some nice mathematical properties
-
--   creates a diminishing returns relationship
-
--   can be interpreted as a 100% increase in X is associated with a $\hat\beta_1$ increase un Y
-
-## Log Transformation in Action
-
-```{r}
-gap.model.log <- lm(lifeExp~log10(gdpPercap), data = gapminder)
-summary(gap.model.log)
-```
-
-## Log Visualized
+## Build a Better Model
 
 ```{r, echo=FALSE}
+gap.model.log <- lm(lifeExp~log10(gdpPercap), data = gapminder)
 ggplot(gapminder, aes(x = gdpPercap, y = lifeExp))+
     geom_point() +
   geom_smooth(method = "lm", formula = y ~ log10(x)) +
@@ -132,41 +100,79 @@ ggplot(gapminder, aes(x = gdpPercap, y = lifeExp))+
   theme_bw()
 ```
 
-## Viewed Another Way
+## Much More Normal
+
+```{r echo=FALSE}
+coef_results2 <- data.frame(intercept = numeric(1000), gdpPercap = numeric(1000))
+for (i in 1:1000){
+  sample <- sample_n(gapminder, 300)
+  model.log <- lm(lifeExp~log10(gdpPercap), data = sample)
+  coef_results2[i,] <- coef(model.log)
+}
+```
 
 ```{r}
+hist(coef_results2$gdpPercap)
+```
+
+# OLS Assumptions
+
+## Main Idea
+
+-   Using OLS to draw inferences about the population based on a sample is predicated on the premise that:
+
+    -    repeated samples of the population will produce a distribution of slope estimates that approximates a normal distribution
+
+    -   that normal distribution will be centered on the actual population slope
+
+    -   and it will have a specific standard error $\frac{\hat {\sigma} ^2}{N * var(X)}$
+
+## If Assumptions Are Violated
+
+-   When the assumptions of OLS are violated, one of two things might happen:
+
+    -   the slope estimates you calculate will be *biased* (i.e. systematically off from the population slope in one direction or the other)
+
+    -   the calculation of the standard error will be off (too big or too small), leading to potentially erroneous inferences about statistical significance
+
+## Assumption #1
+
+1) Your model is correct
+
+    -   it includes all the right variables (exogeneity assumption)
+
+    -   it takes the correct functional form (linearity assumption)
+
+    -   there's no measurement error
+
+-   violations of these assumptions produce biased estimates of $\hat \beta_1$
+
+## Assumption #2
+
+2) After fitting the model, the errors are independent, normally distributed, with mean 0
+
+    -   the models predictions $\hat Y_i$ are just as likely to be above as below the observed values $Y_i$ all across the range of the data
+
+    -   the errors/residuals have no pattern to them: they are not correlated with each other, with the value of X, or with any other third variable Z
+
+-   violations of these assumptions may also be an indicator of violations of Assumption 1; if not, they may still lead to incorrect standard errors
+
+## Are the assumptions violated?
+
+```{r, echo=FALSE}
+
 ggplot(gapminder, aes(x = gdpPercap, y = lifeExp))+
     geom_point() +
-  geom_smooth(method = "lm", formula = y ~ x) +
-  scale_x_log10() + 
+  geom_smooth(method = "lm", formula = y ~ log10(x)) +
   labs(x = "GDP Per Capita", y = "Life Expectancy in Years",
-         title = "Economic Development and Life Expectancy by Continent",
+         title = "Economic Development and Life Expectancy",
          subtitle = "Data points are country-years",
          caption = "Source: Gapminder.") + 
   theme_bw()
+
 ```
 
-## When to use transformations
-
--   use a transformation when you think the relationship between X and Y *changes* based on the value of X
-
--   if you think it diminishes as X increases, use a **log transformation**
-
-    -   e.g. "I think increased pcGDP will be associated with longer life expectancies up to a point, but once pcGDP is already high, increasing further will not have as much of an effect"
-
-    -   not a bad idea to always use when the distribution of a variable is highly skewed
-
-    -   if you have 0s in your data, you will need to use something else (e.g. square root)
-
-## When to use transformations
-
--   if you think it changes from positive to negative as X increases, use a squared polynomial term
-
-    -   e.g. "I think once you get to a certain point, greater pcGDP will actually be associated with lower life expectancies" (but this doesn't actually make sense!)
-
-    -   e.g. "I think protest will be less likely in highly authoritarian countries (Polity \< -5), more likely in anocracies (Polity -5 to 5), but then less likely again in democratic countries (Polity \> 5)" (this makes more sense)
-
-# Binary Independent Variables
+# Recap: Binary Independent Variables
 
 ## Let's Separate Oil Countries
 
@@ -197,7 +203,7 @@ ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, color = oil))+
   theme_bw()
 ```
 
-# Interactions
+# Recap: Interactions
 
 ## Different Slopes
 
@@ -243,29 +249,19 @@ ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, color = oil))+
   theme_bw()
 ```
 
-```{r}
-ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, color = oil, group = oil))+
-    geom_point() +
-  geom_smooth(method = "lm") +
-  scale_x_log10() +
-  labs(x = "GDP Per Capita", y = "Life Expectancy in Years",
-         title = "Economic Development and Life Expectancy",
-         subtitle = "Data points are country-years",
-         caption = "Source: Gapminder.") + 
-  theme_bw()
-```
-
 ## When to use interactions
 
 -   use an interaction when you think the relationship between X and Y *changes* based on the value of some other variable (Z)
 
     -   e.g. "I think that additional per capita GDP will have a bigger impact on life expectancy in non-oil countries than oil countries
+    
+## When NOT to use interactions
 
 -   just add a categorical/dummy control variable when you think some other variable impacts Y, but not the relationship between X and Y
 
     -   e.g. "I think that oil countries will have lower life expectancies than non-oil countries, irrespective of per capita GDP"
 
-# Categorical Variables
+# Recap: Categorical Variables
 
 ## Categorical Variables
 
@@ -274,8 +270,6 @@ ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, color = oil, group = oil))+
 -   You create distinct dummy variables for each category: Africa? 1 or 0; Asia? 1 or 0
 
 -   You put the dummy variables in for all categories EXCEPT ONE
-
--   That category becomes the reference: the coefficients for all other dummies compare those levels of the category to the reference
 
 -   R will do all this for you automatically if you include a categorical variable in the model
 
@@ -299,7 +293,8 @@ summary(gap.model.cont)
 ## Re-leveling
 
 ```{r}
-gapminder$continent2 <- factor(gapminder$continent, levels = c("Europe", "Africa", "Americas", "Asia", "Oceania"))
+gapminder$continent2 <- factor(gapminder$continent, 
+                               levels = c("Europe", "Africa", "Americas", "Asia", "Oceania"))
 gap.model.cont2 <- lm(lifeExp~log10(gdpPercap) + continent2, data = gapminder)
 summary(gap.model.cont2)
 ```
@@ -353,7 +348,8 @@ ggplot(gapminder, aes(x = gdpPercap, y = olympics))+
 ## Logits in R
 
 ```{r}
-olymp.logit <- glm(olympics~log10(gdpPercap), family = binomial(link = "logit"), data = gapminder)
+olymp.logit <- glm(olympics~log10(gdpPercap), 
+                   family = binomial(link = "logit"), data = gapminder)
 summary(olymp.logit)
 ```
 
@@ -365,9 +361,9 @@ summary(olymp.logit)
 
 -   but the slope of the line changes with X!
 
--   marginal effect at mean: calculate the slope at the mean of X
+-   marginal effect at mean: the slope at the mean of X
 
--   average marginal effect: calculate the average slope across the entire curve
+-   average marginal effect: the average slope across the entire curve
 
 ## Calculating average marginal effect
 
