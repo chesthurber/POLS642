@@ -1,0 +1,292 @@
+---
+title: "W6L2: Robust Standard Errors"
+subtitle: "POLS 642 Intermediate Analysis of Political Data"
+author: "Dr. Ches Thurber"
+format: 
+  revealjs:
+    theme: simple
+execute: 
+  echo: true
+editor: visual
+---
+
+## Plan for Today
+
+1\) OLS Assumptions
+
+2\) Diagnostics
+
+3\) Heteroskedasticity
+
+4\) Correlated Errors
+
+5\) Multicollinearity
+
+## Planning Ahead
+
+-   Friday 2/27: Problem Set #1 Due
+
+-   Thur 3/5: Midterm Exam
+
+## Packages
+
+```{r}
+library(gapminder)
+library(dplyr)
+library(ggplot2)
+#install.packages("lmtest")
+library(lmtest)
+#install.packages("sandwich")
+library(sandwich)
+gapminder <- gapminder
+```
+
+# OLS Assumptions
+
+## Main Idea
+
+-   Using OLS to draw inferences about the population based on a sample is predicated on the premise that:
+
+    -   repeated samples of the population will produce a distribution of slope estimates that approximates a normal distribution
+
+    -   that normal distribution will be centered on the actual population slope
+
+    -   and it will have a specific standard error $\frac{\hat {\sigma} ^2}{N * var(X)}$
+
+## If Assumptions Are Violated
+
+-   When the assumptions of OLS are violated, one of two things might happen:
+
+    -   the slope estimates you calculate will be *biased* (i.e. systematically off from the population slope in one direction or the other)
+
+    -   the calculation of the standard error will be off (too big or too small), leading to potentially erroneous inferences about statistical significance
+
+## Assumption #1
+
+1)  Your model is correct
+
+    -   it includes all the right variables (exogeneity assumption)
+
+    -   it takes the correct functional form (linearity assumption)
+
+    -   there's no measurement error
+
+-   violations of these assumptions produce biased estimates of $\hat \beta_1$
+
+## Assumption #2
+
+2)  After fitting the model, the errors are independent, normally distributed, with mean 0
+
+    -   the models predictions $\hat Y_i$ are just as likely to be above as below the observed values $Y_i$ all across the range of the data
+
+    -   the errors/residuals have no pattern to them: they are not correlated with each other, with the value of X, or with any other third variable Z
+
+-   violations of these assumptions may also be an indicator of violations of Assumption 1; if not, they may still lead to incorrect standard errors
+
+## Another Approach: LINE
+
+L - The regression model is linear in the parameters
+
+I - Independence of the errors (No autocorrelation)
+
+N - Normality of errors, with mean 0
+
+E - Equal variance of errors (homoskedasticity)
+
+## Are the assumptions violated?
+
+```{r, echo=FALSE}
+
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp))+
+    geom_point() +
+  geom_smooth(method = "lm", formula = y ~ log10(x)) +
+  labs(x = "GDP Per Capita", y = "Life Expectancy in Years",
+         title = "Economic Development and Life Expectancy",
+         subtitle = "Data points are country-years",
+         caption = "Source: Gapminder.") + 
+  theme_bw()
+
+```
+
+## How about now?
+
+```{r echo=F}
+oil <- c("Kuwait", "Saudi Arabia", "Venezuela", "Norway", "Iran")
+gapminder$oil <- factor(ifelse(gapminder$country %in% oil, 1, 0))
+gap.model.int <- lm(lifeExp~log10(gdpPercap)* oil, data = gapminder)
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, color = oil))+
+    geom_point() +
+  geom_abline(slope = 20, intercept = -12, color = "red") +
+  geom_abline(slope = 11, intercept = 18, color = "blue") + 
+  scale_x_log10() +
+  labs(x = "GDP Per Capita", y = "Life Expectancy in Years",
+         title = "Economic Development and Life Expectancy",
+         subtitle = "Data points are country-years",
+         caption = "Source: Gapminder.") + 
+  theme_bw()
+```
+
+# Diagnostics
+
+## Post-Estimation Diagnostics
+
+-   often rely on residuals ( $\epsilon_i$ ) and fitted values ( $\hat Y_i$ )
+
+-   these are buried in the model object and can be extracted
+
+```{r}
+gap.model.int$residuals[1:5]
+
+```
+
+## Pre-Loaded Diagnostic Plots
+
+```{r}
+par(mfrow=c(2,2))
+plot(gap.model.int)
+```
+
+## Plot 1: Residuals Over Fitteds
+
+```{r, echo=F}
+par(mfrow=c(1,1))
+plot(gap.model.int, which = 1)
+```
+
+-   helps us evaluate all assumptions, especially linearity
+-   points should be evenly distributed above and below zero
+
+## Plot 2: QQ Plot
+
+```{r, echo=F}
+plot(gap.model.int, which = 2)
+```
+
+-   it's a quantile/quantile plot of the residuals
+-   assesses the normality of the errors
+-   you want it to follow closely to a straight line
+
+## Plot 3: Scale Location Plot
+
+```{r, echo=F}
+plot(gap.model.int, which = 3)
+```
+
+-   it's a good test of homoskedasticity
+-   you want a horizontal line with equally spread points
+-   if not, you may have a heteroskedasticity problem
+
+## Plot 4: Residuals vs. Leverage
+
+```{r, echo=F}
+plot(gap.model.int, which = 4)
+```
+
+-   it's a good indicator of outliers that may be skewing your results
+
+# What might we do at this point?
+
+# Heteroskedasticity
+
+## Heteroskedasticity
+
+-   OLS assumes that there is no correlation between the variance of the errors and X
+
+-   that is, that the model is not "better" over some ranges of X than others
+
+-   violating this assumption does NOT produce biased coefficients in OLS
+
+-   it only produces inaccurate standard errors
+
+-   it could go either way: too small or too large
+
+## Textbook Example of Heteroskedasticity
+
+![](https://theeffectbook.net/the-effect_files/figure-html/statisticaladjustment-instagram-1.png)
+
+## Diagnosis
+
+-   scatterplot
+
+-   scale-location plot from the base R diagnostic plots
+
+-   Breusch-Pagan Test
+
+## Breusch-Pagan Test
+
+```{r}
+lmtest::bptest(gap.model.int)
+```
+
+*You DON'T want to reject the null*
+
+## Solutions
+
+-   Better model? Can you reduce the deviance that is causing the heteroskedasticity?
+
+-   "Robust" Standard Errors: adjustments to the standard error formula that accounts for the additional variation in the sampling distribution that arises from heteroskedasticity
+
+## Implementing Robust Standard Errors
+
+```{r}
+coeftest(gap.model.int, vcov = vcovHC(gap.model.int, type="HC1"))
+```
+
+## Comparing to Original
+
+```{r}
+summary(gap.model.int)
+```
+
+# Correlated Errors
+
+## Autocorrelation and Clustering
+
+-   when the errors are correlated by time or group
+
+-   occurs in any kind of repeated measures, time-series data
+
+-   diagnosis: theoretical, outliers with common condition, Durbin-Watson test
+
+-   solution:
+
+    -   always: robust standard errors, "clustered" robust errors
+    -   sometimes: fixed effects models, control variables
+
+## Textbook Autocorrelation Example
+
+![](https://theeffectbook.net/the-effect_files/figure-html/statisticaladjustment-unemployment-1.png)
+
+## Solutions
+
+-   "Heteroskedasticity and Autocorrelation Robust" standard errors when errors are correlated to observations before and after
+
+-   "Clustered" errors when data contains groups within which errors might be correlated
+
+-   Consider forms of time-series and hierarchical modeling
+
+## Implementing Clustered Errors
+
+```{r}
+coeftest(gap.model.int, vcov = vcovCL(gap.model.int, cluster = gapminder$country))
+```
+
+# Multicollinearity
+
+## Multicollinearity
+
+-   when 2 or more of your Xs are very highly correlated
+
+-   it doesn't violate OLS assumptions
+
+-   but your standard errors get really big
+
+-   there's no great solution
+
+## Possible solutions
+
+-   Demonstrate that the two variables are jointly significant (F-test)
+
+-   Consider whether both are truly necessary
+
+-   Dimension reduction (principal components, factor analysis)
