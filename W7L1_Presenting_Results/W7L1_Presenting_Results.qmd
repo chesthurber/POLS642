@@ -1,0 +1,330 @@
+---
+title: "W7L1: Presenting Results"
+subtitle: "POLS 642 Intermediate Analysis of Political Data"
+author: "Dr. Ches Thurber"
+format: 
+  revealjs:
+    theme: simple
+execute: 
+  echo: true
+editor: visual
+---
+
+## Plan for Today
+
+1\) Recap
+
+2\) Tables with Modelsummary
+
+3\) Plots with Modelplot
+
+4\) Visualizing SEs
+
+## Planning Ahead
+
+-   Today: Tables and Coefficient Plots
+
+-   Thursday: Predicted Values
+
+-   Friday 2/27: Problem Set #1 Due
+
+-   Thur 3/5: Midterm Exam
+
+## Packages
+
+```{r}
+library(gapminder)
+library(dplyr)
+library(ggplot2)
+#install.packages("lmtest")
+library(lmtest)
+#install.packages("sandwich")
+library(sandwich)
+#install.packages("modelsummary")
+library(modelsummary)
+#install.packages("pandoc")
+gapminder <- gapminder
+```
+
+# Don't Just Crank Out Regressions!
+
+## The Process
+
+1\) Look at your data (make adjustments)
+
+2\) Run your models
+
+3\) Look at your models (make adjustments)
+
+## We Looked at our data
+
+```{r, echo=FALSE}
+
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp))+
+    geom_point() +
+  labs(x = "GDP Per Capita", y = "Life Expectancy in Years",
+         title = "Economic Development and Life Expectancy",
+         subtitle = "Data points are country-years",
+         caption = "Source: Gapminder.") + 
+  theme_bw()
+
+```
+
+## We Made Adjustments
+
+```{r, echo=FALSE}
+
+ggplot(gapminder, aes(x = log10(gdpPercap), y = lifeExp))+
+    geom_point() +
+  labs(x = "GDP Per Capita", y = "Life Expectancy in Years",
+         title = "Economic Development and Life Expectancy",
+         subtitle = "Data points are country-years",
+         caption = "Source: Gapminder.") + 
+  theme_bw()
+```
+
+## We Ran the Model
+
+```{r, echo = F}
+gap.model.log <- lm(lifeExp~log10(gdpPercap), data = gapminder)
+summary(gap.model.log)
+```
+
+## We Looked at the Model
+
+```{r echo=F}
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp))+
+    geom_point() +
+  geom_abline(slope = 19, intercept = -9, color = "blue") + 
+  scale_x_log10() +
+  labs(x = "GDP Per Capita", y = "Life Expectancy in Years",
+         title = "Economic Development and Life Expectancy",
+         subtitle = "Data points are country-years",
+         caption = "Source: Gapminder.") + 
+  theme_bw()
+
+```
+
+## We Refined The Model
+
+```{r echo = F}
+oil <- c("Kuwait", "Saudi Arabia", "Venezuela", "Norway", "Iran")
+gapminder$oil <- factor(ifelse(gapminder$country %in% oil, 1, 0))
+gap.model.int <- lm(lifeExp~log10(gdpPercap)* oil, data = gapminder)
+summary(gap.model.int)
+```
+
+## We Looked at it Again
+
+```{r echo=F}
+oil <- c("Kuwait", "Saudi Arabia", "Venezuela", "Norway", "Iran")
+gapminder$oil <- factor(ifelse(gapminder$country %in% oil, 1, 0))
+gap.model.oil <- lm(lifeExp~log10(gdpPercap) + oil, data = gapminder)
+gap.model.int <- lm(lifeExp~log10(gdpPercap)* oil, data = gapminder)
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, color = oil))+
+    geom_point() +
+  geom_abline(slope = 20, intercept = -12, color = "red") +
+  geom_abline(slope = 11, intercept = 18, color = "blue") + 
+  scale_x_log10() +
+  labs(x = "GDP Per Capita", y = "Life Expectancy in Years",
+         title = "Economic Development and Life Expectancy",
+         subtitle = "Data points are country-years",
+         caption = "Source: Gapminder.") + 
+  theme_bw()
+```
+
+## We Looked at Diagnostic Plots
+
+```{r, echo = F}
+par(mfrow=c(2,2))
+plot(gap.model.int)
+```
+
+## Plot 1: Residuals Over Fitteds
+
+```{r, echo=F}
+par(mfrow=c(1,1))
+plot(gap.model.int, which = 1)
+```
+
+-   helps us evaluate all assumptions, especially linearity
+-   points should be evenly distributed above and below zero
+
+## Plot 2: QQ Plot
+
+```{r, echo=F}
+plot(gap.model.int, which = 2)
+```
+
+-   it's a quantile/quantile plot of the residuals
+-   assesses the normality of the errors
+-   you want it to follow closely to a straight line
+
+## Plot 3: Scale Location Plot
+
+```{r, echo=F}
+plot(gap.model.int, which = 3)
+```
+
+-   it's a good test of homoskedasticity
+-   you want a horizontal line with equally spread points
+-   if not, you may have a heteroskedasticity problem
+
+## Plot 4: Residuals vs. Leverage
+
+```{r, echo=F}
+plot(gap.model.int, which = 5)
+```
+
+-   it's a good indicator of outliers that may be skewing your results
+
+## We tested for Heteroskedasticity
+
+```{r}
+lmtest::bptest(gap.model.int)
+```
+
+*You DON'T want to reject the null*
+
+## We Implemented Robust Standard Errors
+
+```{r}
+coeftest(gap.model.int, vcov = vcovHC(gap.model.int, type="HC1"))
+```
+
+## We Implemented Clustered Errors
+
+```{r}
+coeftest(gap.model.int, vcov = 
+           vcovCL(gap.model.int, 
+                  cluster = gapminder$country))
+```
+
+# What Sense to Make of This?
+
+## My Take
+
+-   In this case, I think the theoretical rationale for clustered errors is so strong that I would only pay attention to models with clustered SEs
+
+-   But there are times where multiple model specifications are justifiable and we want to show results across a range of models
+
+-   How can we do this in a way that is clear, polished and professional?
+
+# Presenting Regression Tables
+
+## Some Principles for Presentation
+
+1)  Present your findings in substantively meaningful terms
+
+2)  Show your degree of confidence
+
+3)  Show your data when you can
+
+4)  Do all of this in a way that is easy for the reader to understand (?!?)
+
+## `modelsummary()`
+
+-   similar to stargazer
+
+-   can do a whole lot more and more easily
+
+-   great website [here.](https://github.com/vincentarelbundock/modelsummary)
+
+## `modelsummary()` in practice
+
+```{r, messages=F, warnings=F}
+modelsummary(list(gap.model.log, gap.model.oil, gap.model.int), 
+             vcov = ~country, stars = T, output = "flextable")
+```
+
+## Make It Look Nice
+
+```{r, echo = F, messages=F, warnings=F}
+modelsummary(list(Base = gap.model.log, Oil = gap.model.oil, Interaction = gap.model.int), coef_rename = c("log10(gdpPercap)" = "Per Capita GDP (log)", "oil1" = "Oil Country", "log10(gdpPercap):oil1" = "GDP * Oil"), vcov = ~country, gof_map = c("nobs", "adj.r.squared"), stars = T, output = "flextable")
+
+
+```
+
+## Export to Word
+
+```{r, eval = F, messages=F, warnings=F}
+modelsummary(list(Base = gap.model.log, 
+                  Oil = gap.model.oil, 
+                  Interaction = gap.model.int), 
+             coef_rename = c("log10(gdpPercap)" = "Per Capita GDP (log)", 
+                             "oil1" = "Oil Country", 
+                             "log10(gdpPercap):oil1" = "GDP * Oil"), 
+             vcov = ~country, gof_map = c("nobs", "R2"), 
+             stars = T, 
+             output = "ModelSummary_Table.docx")
+
+
+```
+
+# Coefficient Plots
+
+## Why Coefficient Plots?
+
+-   allows for easy visual comparisons
+
+-   especially useful for presentations
+
+-   "friends don't let friends present regression tables at conferences!"
+
+## `modelplot()`
+
+```{r, eval = F}
+
+modelplot(list(Base = gap.model.log, 
+                        Oil = gap.model.oil, 
+                        Interaction = gap.model.int), 
+                   coef_rename = c("log10(gdpPercap)" = "Per Capita GDP (log)", 
+                                   "oil1" = "Oil Country", 
+                                   "log10(gdpPercap):oil1" = "GDP * Oil"),
+                   vcov = ~country)
+
+```
+
+## Coefficient Plot
+
+```{r, echo= F}
+modelplot(list(Base = gap.model.log, 
+                        Oil = gap.model.oil, 
+                        Interaction = gap.model.int), 
+                   coef_rename = c("log10(gdpPercap)" = "Per Capita GDP (log)", 
+                                   "oil1" = "Oil Country", 
+                                   "log10(gdpPercap):oil1" = "GDP * Oil"),
+                   vcov = ~country)
+```
+
+# Illustrating Robust SEs
+
+## Tabular Form
+
+```{r}
+
+Robust.Table <- modelsummary(list(Base = gap.model.int, Robust = gap.model.int, Clustered = gap.model.int), coef_rename = c("log10(gdpPercap)" = "Per Capita GDP (log)", "oil1" = "Oil Country", "log10(gdpPercap):oil1" = "GDP * Oil"), vcov = list(vcov, vcovHC, ~country), gof_map = c("nobs", "adj.r.squared"), stars = T, output = "flextable")
+```
+
+## As a table
+
+```{r, echo = F}
+Robust.Table
+```
+
+## As a plot
+
+```{r, echo = F}
+
+modelplot(list(Base = gap.model.int, Robust = gap.model.int, Clustered = gap.model.int), coef_rename = c("log10(gdpPercap)" = "Per Capita GDP (log)", "oil1" = "Oil Country", "log10(gdpPercap):oil1" = "GDP * Oil"), vcov = list(vcov, vcovHC, ~country))
+```
+
+## Summary
+
+1\) Always look at your data, both before and after running models
+
+2\) Think carefully about which models you want to run and present to your reader
+
+3\) Use pictures and graphs where possible
+
+4\) Use an appendix to present additional tables of robustness checks
