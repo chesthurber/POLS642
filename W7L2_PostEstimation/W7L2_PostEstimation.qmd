@@ -1,0 +1,230 @@
+---
+title: "W7L2: Post-Estimation Analysis"
+subtitle: "POLS 642 Intermediate Analysis of Political Data"
+author: "Dr. Ches Thurber"
+format: 
+  revealjs:
+    theme: simple
+execute: 
+  echo: true
+editor: visual
+---
+
+## Plan for Today
+
+1\) Recap
+
+2\) Tables with Modelsummary
+
+3\) Plots with Modelplot
+
+4\) Visualizing SEs
+
+## Planning Ahead
+
+-   Thursday: Predicted Values
+
+-   Friday 2/27: Problem Set #1 Due
+
+-   Thur 3/5: Midterm Exam
+
+## Packages
+
+```{r}
+library(gapminder)
+library(dplyr)
+library(ggplot2)
+#install.packages("lmtest")
+library(lmtest)
+#install.packages("sandwich")
+library(sandwich)
+#install.packages("modelsummary")
+library(modelsummary)
+#install.packages("pandoc")
+#install.packages("marginaleffects")
+library(marginaleffects)
+gapminder <- gapminder
+```
+
+# Don't Just Crank Out Regressions!
+
+## The Process
+
+1\) Look at your data (make adjustments)
+
+2\) Run your models
+
+3\) Look at your models (make adjustments)
+
+## We Looked at our data
+
+```{r, echo=FALSE}
+olympics <- c("United States", "Italy", "France", "Norway", "Japan", "United Kingdom", "Greece", "Australia", "China", "South Korea", "Russia", "Austria", "Switzerland")
+gapminder$olympics <- ifelse(gapminder$country %in% olympics, 1, 0)
+ggplot(gapminder, aes(x = gdpPercap, y = olympics))+
+    geom_point() +
+  scale_x_log10() +
+  theme_bw()
+
+```
+
+## We Ran the Model
+
+```{r, echo = F}
+olymp.ols <- lm(olympics~log10(gdpPercap), data = gapminder)
+modelsummary(list("LPM" = olymp.ols), output = "flextable", coef_rename = c("log10(gdpPercap)" = "Per Capita GDP (log)") ,gof_map = c("nobs", "r.squared"), vcov = ~country, stars = T)
+```
+
+## We Looked at the Model
+
+```{r echo=F}
+ggplot(gapminder, aes(x = gdpPercap, y = olympics))+
+    geom_point() +
+  geom_abline(slope = .16, intercept = -.49, color = "blue") +
+  scale_x_log10() +
+  theme_bw()
+
+```
+
+## We Refined The Model
+
+```{r echo = F}
+olymp.logit <- glm(olympics~log10(gdpPercap), 
+                   family = binomial(link = "logit"), data = gapminder)
+modelsummary(list("LPM" = olymp.ols, "Logit" = olymp.logit), output = "flextable", coef_rename = c("log10(gdpPercap)" = "Per Capita GDP (log)") ,gof_map = c("nobs", "aic") , vcov = ~country, stars = T)
+```
+
+# What sense do we make of that?!?
+
+# Post-Estimation Analysis
+
+## Types of Post-Estimation Analysis
+
+-   Marginal Effects: how much does a 1-unit change in X affect our predicted value of Y?
+
+-   Expected Values: what is our predicted value of Y across a range of values of X, holding other control variables constant
+
+-   Many packages can help you do this; we'll use `marginaleffects()`
+
+# Marginal Effects
+
+## Average Marginal Effects
+
+-   recall that in logit models, our regression line "curves", so the slope changes depending on the value of X
+
+-   this is also true with log and polynomial transformations
+
+-   average marginal effects are the average slope across the range of x
+
+-   this often makes sense, but not always! (e.g. a u-shaped curve, or if logit curve does funny things at the extremes...)
+
+## Calculating AME with `marginaleffects()`
+
+```{r}
+slope <- avg_slopes(olymp.logit, variables = "gdpPercap", vcov = ~country)
+slope
+```
+
+## Putting it in a table
+
+```{r}
+
+modelsummary(list("Logit AME" = slope), output = "flextable", coef_rename = c("gdpPercap" = "Per Capita GDP") ,gof_map = c("nobs", "aic"), stars = T)
+```
+
+## Putting it on a plot
+
+```{r, eval = F}
+modelplot(list("Logit AME" = slope), coef_rename = c("gdpPercap" = "Per Capita GDP")) +
+   labs(x = 'Average Marginal Effects', 
+         y = 'Variables',
+         title = 'Correlates of Hosting the Olympics',
+         caption = "SEs Clustered by Country") +
+  theme_classic() +
+  geom_vline(xintercept = 0)
+```
+
+## Putting it on a plot
+
+```{r, echo = F}
+modelplot(list("Logit AME" = slope), coef_rename = c("gdpPercap" = "Per Capita GDP")) +
+   labs(x = 'Average Marginal Effects', 
+         y = 'Variables',
+         title = 'Correlates of Hosting the Olympics',
+         caption = "SEs Clustered by Country") +
+  theme_classic() +
+  geom_vline(xintercept = 0)
+
+```
+
+# Expected Values Plots
+
+## Expected Values Plots
+
+-   this is just like when we place our regression line on our scatterplot
+
+-   it's a little more complicated when there are multiple variables in our model
+
+-   we might want to set those other variables to their means, or set them to specific values (e.g. oil = 1, or oil = 0)
+
+## Using `plot_predictions()`
+
+```{r}
+plot_predictions(olymp.logit, condition= c("gdpPercap"))
+```
+
+## Fixing Up with `ggplot()`
+
+```{r}
+plot_predictions(olymp.logit, condition= c("gdpPercap")) +
+  scale_x_log10() +
+  theme_bw() +
+  labs(x = 'Per Capita GDP', 
+         y = 'Probability of Being an Olympic Host',
+         title = 'Economic Development and the Olympics',
+         caption = "SEs Clustered by Country") 
+```
+
+# With an interaction term
+
+## Fitting the Model
+
+```{r}
+oil <- c("Kuwait", "Saudi Arabia", "Venezuela", "Norway", "Iran")
+gapminder$oil <- factor(ifelse(gapminder$country %in% oil, 1, 0))
+olymp.logit.oil <- glm(olympics~log10(gdpPercap) + oil, 
+                   family = binomial(link = "logit"), data = gapminder)
+olymp.logit.int <- glm(olympics~log10(gdpPercap)*oil, 
+                   family = binomial(link = "logit"), data = gapminder)
+
+```
+
+## A Nice Table
+
+```{r echo = F}
+modelsummary(list("Base" = olymp.logit, "Oil" = olymp.logit.oil, "Interaction" = olymp.logit.int), output = "flextable", coef_rename = c("log10(gdpPercap)" = "Per Capita GDP (log)", "oil1" = "Oil Country", "log10(gdpPercap):oil1" = "GDP * Oil") ,gof_map = c("nobs", "aic") , vcov = ~country, stars = T, notes = "Std. errors clustered by country")
+```
+
+## Conditional MEs
+
+```{r}
+plot_slopes(olymp.logit.int, variables = "gdpPercap", condition = "oil", vcov = ~country)
+```
+
+## Conditional Probabilities
+
+```{r}
+cond.probs.plot <- plot_predictions(olymp.logit.int, condition= c("gdpPercap", "oil")) +
+  scale_x_log10() +
+  theme_bw() +
+  labs(x = 'Per Capita GDP', 
+         y = 'Probability of Being an Olympic Host',
+         title = 'Economic Development and the Olympics',
+         caption = "SEs Clustered by Country") 
+```
+
+## The Plot
+
+```{r echo = F}
+cond.probs.plot
+```

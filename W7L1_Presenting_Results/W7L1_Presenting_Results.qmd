@@ -281,7 +281,9 @@ modelplot(list(Base = gap.model.log,
                    coef_rename = c("log10(gdpPercap)" = "Per Capita GDP (log)", 
                                    "oil1" = "Oil Country", 
                                    "log10(gdpPercap):oil1" = "GDP * Oil"),
-                   vcov = ~country)
+                   vcov = ~country) +
+  theme_classic() +
+  geom_vline(xintercept = 0)
 
 ```
 
