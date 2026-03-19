@@ -121,7 +121,7 @@ hist(coef_results2$gdpPercap)
 
 -   Using OLS to draw inferences about the population based on a sample is predicated on the premise that:
 
-    -    repeated samples of the population will produce a distribution of slope estimates that approximates a normal distribution
+    -   repeated samples of the population will produce a distribution of slope estimates that approximates a normal distribution
 
     -   that normal distribution will be centered on the actual population slope
 
@@ -137,7 +137,7 @@ hist(coef_results2$gdpPercap)
 
 ## Assumption #1
 
-1) Your model is correct
+1)  Your model is correct
 
     -   it includes all the right variables (exogeneity assumption)
 
@@ -149,7 +149,7 @@ hist(coef_results2$gdpPercap)
 
 ## Assumption #2
 
-2) After fitting the model, the errors are independent, normally distributed, with mean 0
+2)  After fitting the model, the errors are independent, normally distributed, with mean 0
 
     -   the models predictions $\hat Y_i$ are just as likely to be above as below the observed values $Y_i$ all across the range of the data
 
@@ -254,7 +254,7 @@ ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, color = oil))+
 -   use an interaction when you think the relationship between X and Y *changes* based on the value of some other variable (Z)
 
     -   e.g. "I think that additional per capita GDP will have a bigger impact on life expectancy in non-oil countries than oil countries
-    
+
 ## When NOT to use interactions
 
 -   just add a categorical/dummy control variable when you think some other variable impacts Y, but not the relationship between X and Y

@@ -14,11 +14,13 @@ editor: visual
 
 1\) Recap
 
-2\) Tables with Modelsummary
+2\) Post-Estimation Analysis
 
-3\) Plots with Modelplot
+3\) Marginal Effects
 
-4\) Visualizing SEs
+4\) Predicted Values
+
+5\) All with Interactions
 
 ## Planning Ahead
 
@@ -106,6 +108,10 @@ modelsummary(list("LPM" = olymp.ols, "Logit" = olymp.logit), output = "flextable
 
 -   Many packages can help you do this; we'll use `marginaleffects()`
 
+-   It has a website that is kinda like a textbook [here](https://marginaleffects.com)
+
+-   I have also used `ggeffects()` , info [here](https://strengejacke.github.io/ggeffects/)
+
 # Marginal Effects
 
 ## Average Marginal Effects
@@ -125,17 +131,20 @@ slope <- avg_slopes(olymp.logit, variables = "gdpPercap", vcov = ~country)
 slope
 ```
 
-## Putting it in a table
+## Putting it in a table with `modelsummary()`
 
 ```{r}
 
-modelsummary(list("Logit AME" = slope), output = "flextable", coef_rename = c("gdpPercap" = "Per Capita GDP") ,gof_map = c("nobs", "aic"), stars = T)
+modelsummary(list("Logit AME" = slope), output = "flextable", 
+             coef_rename = c("gdpPercap" = "Per Capita GDP") ,
+             gof_map = c("nobs", "aic"), stars = T)
 ```
 
 ## Putting it on a plot
 
 ```{r, eval = F}
-modelplot(list("Logit AME" = slope), coef_rename = c("gdpPercap" = "Per Capita GDP")) +
+modelplot(list("Logit AME" = slope), 
+          coef_rename = c("gdpPercap" = "Per Capita GDP")) +
    labs(x = 'Average Marginal Effects', 
          y = 'Variables',
          title = 'Correlates of Hosting the Olympics',
@@ -157,9 +166,9 @@ modelplot(list("Logit AME" = slope), coef_rename = c("gdpPercap" = "Per Capita G
 
 ```
 
-# Expected Values Plots
+# Predicted Values Plots
 
-## Expected Values Plots
+## Predicted Values Plots
 
 -   this is just like when we place our regression line on our scatterplot
 
@@ -208,7 +217,10 @@ modelsummary(list("Base" = olymp.logit, "Oil" = olymp.logit.oil, "Interaction" =
 ## Conditional MEs
 
 ```{r}
-plot_slopes(olymp.logit.int, variables = "gdpPercap", condition = "oil", vcov = ~country)
+plot_slopes(olymp.logit.int, 
+            variables = "gdpPercap", 
+            condition = "oil", 
+            vcov = ~country)
 ```
 
 ## Conditional Probabilities
