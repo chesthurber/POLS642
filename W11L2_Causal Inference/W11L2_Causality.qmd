@@ -1,0 +1,213 @@
+---
+title: "W11L2: Causality"
+subtitle: "POLS 642 Intermediate Analysis of Political Data"
+author: "Dr. Ches Thurber"
+format: 
+  revealjs:
+    theme: simple
+execute: 
+  echo: true
+editor: visual
+---
+
+## Plan for Today
+
+1\) "Bell Ringer"
+
+2\) Causality
+
+3\) Experiments
+
+4\) Observational Studies
+
+## Packages
+
+```{r}
+#install.packages("ggdag")
+library(ggdag)
+```
+
+## Bell-Ringer
+
+I have really cool data on campaign spending in municipal elections in Indonesia. My theoretical intuition is that greater spending will cause candidates to get higher vote shares. I run a bivariate regression and... STARS! But...
+
+1\) Dr. Schrauf says I need to "control" for candidate quality. Should I?
+
+2\) My friend says I need to control for whether the candidate spent money on radio advertising. Should I?
+
+3\) If I still have a statistically significant result, can I claim that I have shown causation?
+
+# Causality
+
+## Defining Causation
+
+Multiple philosophical definitions:
+
+1\) X is associated with Y, temporally precedes it, with no supurriousness (correlational)
+
+2\) Y "listens" to X, and behaves in response (mechanistic)
+
+3\) Absent X, Y would be different (counterfactual)
+
+4\) It's all just a social construct, man. Better just to interrogate your positionality...(constitutive)
+
+## The Problem of Endogeneity
+
+-   in order to infer causality, we must assume that the treatment and control groups are identical in all ways that might affect the outcome
+
+-   *endogeneity* refers to any theoretical process that might make this assumption untrue. It usually takes one of two forms:
+
+-   Reverse causality: Y causes X
+
+-   Omitted Variable Bias (OVB) or a confounding variable: a third variable Z causes both X and Y
+
+## Example
+
+-   as publicly-funded but privately-run "charter schools" became widespread in the United States, policymakers and citizens wanted to know whether they produced better outcomes than public schools
+
+-   First, analysts compared the test scores of students in public schools versus charter schools. They were higher in charter schools!
+
+-   Charter schools were associated with higher test scores. But did they *cause* those higher test scores?
+
+## Confounding Variables
+
+A confounding variable is any variable that:
+
+1\) affects the likelihood of receiving treatment $X$ , AND
+
+2\) affects the outcome $Y$
+
+```{r, echo = F}
+ggdag_confounder_triangle() + theme_dag()
+```
+
+## The Confounder
+
+-   in the case of charter schools, greater *family income* might make students more likely to choose a charter school AND more likely to achieve higher test scores
+
+    ```{r, echo = F}
+
+    ggdag_confounder_triangle() + theme_dag()
+    ```
+
+## The Problem
+
+-   our treatment and control groups are not identical in a way that likely affects test scores
+
+-   the higher average test scores for charter school students may be the result of the treatment group's higher average family income, rather than the result of charter schools
+
+-   our results are biased because of an omitted confounding variable: family income
+
+## The Solutions
+
+1\) Experimental research designs (Randomized Controlled Trials or RCTs)
+
+2\) Multivariate Regression: adding additional variables to a regression as "controls"
+
+3\) Quasi-experimental approaches (instrumental variables, difference-in-differences, regression discontinuity designs, matching methods)
+
+# Experiments
+
+## Experiments: The Beauty of Randomization
+
+-   when you are able to randomize treatment, you know you should have two groups – treatment and control – that should be, on average, identical in all observed and unobserved pre-treatment characteristics
+
+-   that is, you can assume that the treated and untreated observations are similar with respect to all the variables that might affect the outcome other than the treatment itself
+
+## Charter School "Lotteries"
+
+-   Researchers looked at charter schools that had held random lotteries to determine who got in.
+
+-   Comparing the students who "won" the lottery and entered the charter school to those who "lost" the lottery and went to public school
+
+-   The lottery created *randomized treatment*, ensuring that the treatment and control groups were identical
+
+-   Most studies using this approach have shown no causal effects for charter schools
+
+## Drawbacks of Experiments
+
+-   Ethics: is it fair to deny some people treatment? or to apply a treatment when the result is unknown and potentially dangerous?
+
+-   Logistics: some things just can't be randomly assigned
+
+-   Financial: experiments are expensive
+
+So if we can't do an experiment, what can we do instead?...
+
+# Causal Inference in Observational Studies
+
+## Multiple Linear Regression
+
+1\) Identify all potential confounding variables
+
+2\) Add potential confounders as additional $X$ variables in a regression model, and model them correctly (transformations, etc...)
+
+## Limitations
+
+-   can we ever truly know that we have included all potential confounders or that we have modeled them correctly??
+
+-   don't want to include *post-treatment* variables: those that might be caused by our treatment
+
+## Mediators
+
+-   these are intervening variables, part of HOW X causes Y
+
+-   e.g. teacher quality or hours studied might be mediators in our charter school example
+
+-   We do NOT want to control for these
+
+```{r, echo = F}
+ggdag_mediation_triangle() + theme_dag()
+```
+
+## Colliders
+
+-   variables that are caused by both X and Y
+
+-   college acceptance would be a collider in our charter school example
+
+-   We do NOT want to control for these
+
+    ```{r, echo = F}
+    ggdag_collider_triangle() + theme_dag()
+    ```
+
+# Let's Map Out Some Cases
+
+## Causation and Plain Regression
+
+-   Multivariate regression is one way of moving toward causation
+
+-   But it requires some heroic assumptions to truly capture a causal relationship
+
+-   as such we never use causal language
+
+-   instead use the language of comparison
+
+## Language of Comparison
+
+"In our study, candidates who had \$1 more in funding achieved on average a $\hat{\beta_1}$ greater share of the vote, holding other factors constant"
+
+## Best Practices in large-N observational work
+
+-   be careful with the language you use
+
+-   clearly specify potentially confounding variables and cite sources to back up
+
+-   maybe even include causal diagram
+
+-   explicitly discuss risks and sources of omitted variable bias
+
+-   sensitivity analysis
+
+## Toward causation in observational studies
+
+-   Other techniques might allow us to relax some of these assumptions
+
+-   Matching methods do not require perfect linearity of confounding variables
+
+-   Fixed Effects will allow us to control for whole sets of possible confounding variables that are in turn correlated with groups in our data
+
+-   Instrumental variables will allow us to find plausibly random variation in our independent variables
+
+## 
