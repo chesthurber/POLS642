@@ -1,5 +1,5 @@
 ---
-title: "W12L1: Causality"
+title: "W13L1: Fixed Effects"
 subtitle: "POLS 642 Intermediate Analysis of Political Data"
 author: "Dr. Ches Thurber"
 format: 
@@ -16,48 +16,28 @@ editor: visual
 
 2\) Causality Review
 
-3\) Matching in Theory
+3\) Fixed Effects in Theory
 
-4\) Matching in Practice
+4\) Fixed Effects in Practice
 
 ## Packages
 
 ```{r}
 #install.packages("ggdag")
+library(gapminder)
 library(ggdag)
 library(ggplot2)
 library(modelsummary)
-#install.packages("MatchIt")
-library(MatchIt)
+library(dplyr)
 #install.packages("flextable")
 library(flextable)
+#install.packages("fixest")
+library(fixest)
 ```
 
 ## Bell-Ringer
 
-Which variables should we control for?
-
-```{r, echo = F}
-mosquito_dag <- dagify(
-malaria_risk~ net + income + health + temperature + resistance + bites,
-net~ income + health + temperature,
-bites ~ net,
-mortality ~ malaria_risk + income + health,
-health~ income,
-exposure = "net",
-outcome = "malaria_risk",
-coords = list(x = c(malaria_risk = 7, net = 3, income = 4, bites = 5, health = 5,
-temperature = 6, resistance = 8.5, mortality = 8.5),
-y = c(malaria_risk = 2, net = 2, income = 3, health = 1,
-temperature = 3, bites = 2, resistance = 3, mortality = 1)),
-labels = c(malaria_risk = "Risk of malaria", net = "Mosquito net", income = "Income",
-health = "Health", bites = "Mosquito bites", temperature = "Nighttime temperatures",
-resistance = "Insecticide resistance", mortality = "Mortality")
-)
-
-ggdag_status(mosquito_dag, use_labels = "label", text = FALSE) +
-theme_dag()
-```
+We've talked a lot about GDP and life expectancy. Draw a DAG/causal diagram of that relationship including potential confounders, mediators, and colliders.
 
 # Causality
 
@@ -71,52 +51,13 @@ theme_dag()
 
 -   Omitted Variable Bias (OVB) or a confounding variable: a third variable Z causes both X and Y
 
-## Example
-
--   as publicly-funded but privately-run "charter schools" became widespread in the United States, policymakers and citizens wanted to know whether they produced better outcomes than public schools
-
--   First, analysts compared the test scores of students in public schools versus charter schools. They were higher in charter schools!
-
--   Charter schools were associated with higher test scores. But did they *cause* those higher test scores?
-
-## Confounding Variables
-
-A confounding variable is any variable that:
-
-1\) affects the likelihood of receiving treatment $X$ , AND
-
-2\) affects the outcome $Y$
-
-```{r, echo = F}
-ggdag_confounder_triangle() + theme_dag()
-```
-
-## The Confounder
-
--   in the case of charter schools, greater *family income* might make students more likely to choose a charter school AND more likely to achieve higher test scores
-
-    ```{r, echo = F}
-
-    ggdag_confounder_triangle() + theme_dag()
-    ```
-
-## The Problem
-
--   our treatment and control groups are not identical in a way that likely affects test scores
-
--   the higher average test scores for charter school students may be the result of the treatment group's higher average family income, rather than the result of charter schools
-
--   our results are biased because of an omitted confounding variable: family income
-
 ## The Solutions
 
 1\) Experimental research designs (Randomized Controlled Trials or RCTs)
 
-2\) Multivariate Regression: adding additional variables to a regression as "controls"
+2\) Multivariate Regression: adding additional variables to a regression as "controls", **including fixed effects**
 
-3\) Quasi-experimental approaches (instrumental variables, difference-in-differences, regression discontinuity designs, **matching methods**)
-
-# Experiments
+3\) Quasi-experimental approaches (instrumental variables, difference-in-differences, regression discontinuity designs, matching methods)
 
 ## Experiments: The Beauty of Randomization
 
@@ -152,198 +93,169 @@ So if we can't do an experiment, what can we do instead?...
 
 ## Limitations
 
--   can we ever truly know that we have included all potential confounders or that we have modeled them correctly??
+-   **can we ever truly know that we have included all potential confounders or that we have modeled them correctly??**
 
 -   don't want to include *post-treatment* variables: those that might be caused by our treatment
 
-## Mediators
-
--   these are intervening variables, part of HOW X causes Y
-
--   e.g. teacher quality or hours studied might be mediators in our charter school example
-
--   We do NOT want to control for these
-
-```{r, echo = F}
-ggdag_mediation_triangle() + theme_dag()
-```
-
-## Colliders
-
--   variables that are caused by both X and Y
-
--   e.g. college acceptance would be a collider
-
--   We do NOT want to control for these
-
-```{r, echo = F}
-ggdag_collider_triangle() + theme_dag()
-```
-
-## Best Practices in Multivariate Regression
-
--   be careful with the language you use
-
--   clearly specify potentially confounding variables and cite sources to back up
-
--   maybe even include causal diagram
-
--   explicitly discuss risks and sources of omitted variable bias
-
--   sensitivity analysis
-
-## Toward causation in observational studies
-
--   Other techniques might allow us to relax some of these assumptions
-
--   **Matching methods** do not require perfect linearity of confounding variables
-
--   Fixed Effects will allow us to control for whole sets of possible confounding variables that are in turn correlated with groups in our data
-
--   Instrumental variables will allow us to find plausibly random variation in our independent variables
-
-# Matching in Theory
-
-## The Problem ...revisited
-
--   our treatment and control groups are not identical in a way that likely affects test scores
-
--   what if we adjusted the control group to make it more similar to the treatment group?
-
-## Approach #1: Weighting
-
--   let's say our treatment group had 80% boys and 20% girls
-
--   we could "weight" the control group, so that it has the same breakdown
-
--   i.e. you compare the average outcome of the treatment group to a weighted average of the control
-
--   you can do this across multiple confounding variables, it just makes the math harder
-
-## Approach #2: 1 to 1 Matching
-
--   for each observation in the treatment group, you could find an observation(s) in the control that are most similar across a set of confounding variables
-
--   you can then take the average difference in outcomes between the treated and untreated observations within each pair
-
--   e.g. "match" a high income boy who went to charter school to a high income boy who did not go to charter school
-
-## How do you match?
-
--   Simple version: you use the same set of confounders that you would otherwise put into a regression to either weight or match observations
-
--   Complex version: there are lots of decisions to make in the mathematics behind the matching and weighting
-
--   Best advice: find a recent article in your area of study where this has been done and follow their approach
-
-## Nearest Neighbor Visualized
-
-![](Mahalanobis.png)
-
-## Analysis
-
--   after you match or weight, you still need to compare the "treatment" and "control"
-
--   you can just compare the mean outcomes (t-test of means)
-
--   or you can plug it into a regression with weights or matched pairs
-
-## Benefits of Matching
-
--   does not rely on some of the assumptions of OLS regression, especially linearity
-
--   an intuitive approach to dealing with "imbalance" or selection effects in treatment
-
--   can also be helpful for qualitative/mixed research
-
-## Drawbacks of Matching
-
--   you need a binary independent variable
-
--   it's still not causation!! it does not solve the underlying problem of unmeasured confounding variables
-
--   it adds complexity in terms of matching algorithms
-
--   the results are either the same as regression...or they're different...
-
-# Matching in Practice
-
-## Heiss Mosquito Nets
+## What Do We Do?
 
 ```{r, echo = F}
 
 mosquito_dag <- dagify(
-malaria_risk~ net + income + health + temperature,
-net~ income + health + temperature,
-health~ income,
+malaria_risk~ net + income + temperature,
+net~ income + temperature,
 exposure = "net",
 outcome = "malaria_risk",
-coords = list(x = c(malaria_risk = 7, net = 3, income = 4, health = 5,
+coords = list(x = c(malaria_risk = 7, net = 3, income = 4, health = 3,
 temperature = 6),
-y = c(malaria_risk = 2, net = 2, income = 3, health = 1,
+y = c(malaria_risk = 2, net = 2, income = 3, health = 4,
 temperature = 3)),
-labels = c(malaria_risk = "Risk of malaria", net = "Mosquito net", income = "Income",
-health = "Health", temperature = "Nighttime temperatures")
+labels = c(malaria_risk = "DV", net = "IV", income = "?",
+health = "Group?", temperature = "??")
 )
 
 ggdag_status(mosquito_dag, use_labels = "label", text = FALSE) +
-theme_dag()
+theme_dag(legend.position = "none")
 ```
 
-## Load the Data
+## Good practices
+
+-   provide a theoretical discussion of what these sources of unmeasured confoundingness might be
+
+-   maybe conduct a "sensitivity analysis" that can measure how strong the confounding relationships would have to be to overturn your finding
+
+-   Or...
+
+## What if?
 
 ```{r, echo = F}
-mosquito_nets <- read.csv("https://evalsp22.classes.andrewheiss.com/data/mosquito_nets.csv")
 
-head(mosquito_nets)
+mosquito_dag <- dagify(
+malaria_risk~ net + income + temperature,
+net~ income + health + temperature,
+income~ health,
+temperature ~ health,
+exposure = "net",
+outcome = "malaria_risk",
+coords = list(x = c(malaria_risk = 7, net = 3, income = 4, health = 3,
+temperature = 6),
+y = c(malaria_risk = 2, net = 2, income = 3, health = 4,
+temperature = 3)),
+labels = c(malaria_risk = "DV", net = "IV", income = "?",
+health = "Group?", temperature = "??")
+)
+
+ggdag_status(mosquito_dag, use_labels = "label", text = FALSE) +
+theme_dag(legend.position = "none")
 ```
 
-## Simple Comparison
+# Fixed Effects
+
+## The Logic of Fixed Effects
+
+-   If you have grouped data...
+
+-   Those groups are likely correlated with confounding variables
+
+-   By controlling for the group (as a categorical variable), you control for all potentially confounding variables that are correlated with the group
+
+## Applied to GDP/Life Expectancy
 
 ```{r, echo = F}
-ggplot(mosquito_nets, aes(x = net, y = malaria_risk)) +
-geom_boxplot() + 
-  theme_bw()
+
+mosquito_dag <- dagify(
+malaria_risk~ net + income + temperature,
+net~ income + health + temperature,
+income~ health,
+temperature ~ health,
+exposure = "net",
+outcome = "malaria_risk",
+coords = list(x = c(malaria_risk = 7, net = 3, income = 4, health = 3,
+temperature = 6),
+y = c(malaria_risk = 2, net = 2, income = 3, health = 4,
+temperature = 3)),
+labels = c(malaria_risk = "Life Exp", net = "pcGDP", income = "history",
+health = "country", temperature = "culture")
+)
+
+ggdag_status(mosquito_dag, use_labels = "label", text = FALSE) +
+theme_dag(legend.position = "none")
 ```
 
-## Naive/Unadjusted Model
+## What kinds of groups?
+
+-   governmental units (countries)
+
+-   time (years)
+
+-   survey waves
+
+-   any nested structure
+
+-   "two-way fixed effects" : both a grouping and a time FE
+
+## How it works
+
+-   you just add the group unit to your model like a categorical variable
+
+-   you can do this manually with `lm()`
+
+-   or you can use a special package for fixed effects
+
+## Different Intercepts, Same Slope
+
+![](https://theeffectbook.net/the-effect_files/figure-html/fixedeffects-interceptdiff-1.png)
+
+# In Practice
+
+## Pooled Model
 
 ```{r}
-model_naive <- lm(malaria_risk~ net, data = mosquito_nets)
-modelsummary(list( "Naive" = model_naive), stars = T, gof_map = c("r.squared","nobs"), output = "flextable") %>% autofit()
+gm <- gapminder
+Model0 <- lm(lifeExp~log(gdpPercap), data = gapminder)
+modelsummary(Model0, stars= T, gof_map = c("nobs","r.squared"))
 ```
 
-## Add Controls
-
-```{r, echo = F}
-model_regression <- lm(malaria_risk~ net + income + temperature + health,
-data = mosquito_nets)
-modelsummary(list( "Naive" = model_naive, "Multivariate" = model_regression), stars = T, gof_map = c("r.squared","nobs"), output = "flextable") %>% autofit()
-```
-
-## Matching using Nearest Neighbor
+## Fixed Effects as Dummies
 
 ```{r}
-matched <- matchit(net~ income + temperature + health, data = mosquito_nets,
-method = "nearest", distance = "mahalanobis", replace = TRUE)
-mosquito_nets_matched <- match.data(matched)
-head(mosquito_nets_matched)
+Model2 <- lm(lifeExp~log(gdpPercap) + factor(country), data = gapminder)
+modelsummary(list("Pooled" = Model0, "FE Dums" = Model2), stars= T, gof_map = c("nobs","r.squared"))
 ```
 
-## Run Matched Regression
+## Fixed Effects with a Package
 
 ```{r}
-model_matched <- lm(malaria_risk~ net, data = mosquito_nets_matched,
-weights = weights)
-modelsummary(list( "Naive" = model_naive, "Multivariate" = model_regression, "Matched" = model_matched), stars = T, gof_map = c("r.squared","nobs"), output = "flextable") %>% autofit()
+Model3 <- feols(lifeExp~log(gdpPercap) | country , data = gapminder)
+modelsummary(list("Pooled" = Model0, "FE Dums" = Model2, "Fixest" = Model3), stars= T, gof_map = c("nobs","r.squared"))
 ```
+
+## One More Point
+
+```{r}
+gm <- gm %>%
+  group_by(country) %>%
+  mutate(lifeExp_within = lifeExp-mean(lifeExp),
+         log_gdpPercap_within = log(gdpPercap) - mean(log(gdpPercap)))
+
+Model1 <- lm(lifeExp_within ~ log_gdpPercap_within, data = gm)
+modelsummary(list("Absorbed FE" = Model1), stars= T, gof_map = c("nobs","r.squared"))
+```
+
+## Meaning of Within-Group Comparisons
+
+-   FEs change our interpretation to one of within-group associations
+
+-   e.g. "Within each country, years with higher GDPs have higher life expectancies"
+
+-   NOT "Countries with higher GDPs have higher life expectancies"
 
 ## Conclusion
 
--   Matching allows you to apply an experimental logic of treatment and control to observational data
+-   Fixed effects allows you to control for confounding factors that are correlated with groups within the data for which you have multiple observations
 
--   It's only as good as your measured confounding variables
+-   It's a powerful tools for mitigating the risk of omitted variable bias
 
--   It does relax some of the OLS assumptions about linearity of confounders
+-   However, we are no longer looking at cross-group comparisons
 
--   It's results are often similar to multivariate regression... and if they are not, which do you trust?
+-   We need variation on all of our variables within each group, can result in loss of observations
