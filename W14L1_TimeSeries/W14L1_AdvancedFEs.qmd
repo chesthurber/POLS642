@@ -1,0 +1,189 @@
+---
+title: "W14L1: Time Series"
+subtitle: "POLS 642 Intermediate Analysis of Political Data"
+author: "Dr. Ches Thurber"
+format: 
+  revealjs:
+    theme: simple
+execute: 
+  echo: true
+editor: visual
+---
+
+## Plan for Today
+
+1\) "Bell Ringer"
+
+2\) Fixed Effects Review
+
+3\) TSCS Data
+
+4\) BTSCS Data
+
+## Packages
+
+```{r}
+#install.packages("ggdag")
+library(gapminder)
+library(ggdag)
+library(ggplot2)
+library(modelsummary)
+library(dplyr)
+#install.packages("flextable")
+library(flextable)
+#install.packages("fixest")
+library(fixest)
+#install.packages("stevemisc")
+library(stevemisc)
+
+```
+
+## Bell-Ringer
+
+Let's say I wanted to get more precise results from my Gapminder analysis of GDP and Life Expectancy. A friend says "Why don't you move from country-year to country-month units of analysis? Then you will have 12x the sample size, reducing your standard errors!"
+
+Is there anything wrong with this?
+
+## Types of Datasets
+
+1\) Cross-sectional data: single observations from each unit (survey responses from a single wave)
+
+2\) Time series data: multiple observations over time from a single unit (daily stock prices)
+
+3\) Panel data: multiple observations over time from multiple unites (aka Time Series Cross-Sectional, TSCS)
+
+## Strengths and Weaknesses
+
+-   allows you to get more observations from your data (maybe)
+
+-   track within group variation
+
+-   But data from within groups will be highly correlated
+
+-   FEs was one approach to dealing with this
+
+# Fixed Effects
+
+## What Do We Do?The Logic of Fixed Effects
+
+-   If you have grouped data...
+
+-   Those groups are likely correlated with confounding variables
+
+-   By controlling for the group (as a categorical variable), you control for all potentially confounding variables that are correlated with the group
+
+## Different Intercepts, Same Slope
+
+![](https://theeffectbook.net/the-effect_files/figure-html/fixedeffects-interceptdiff-1.png)
+
+## Fixed Effects as Diffs from Group Mean
+
+```{r, echo = F}
+gm <- gapminder
+Model0 <- lm(lifeExp~log(gdpPercap), data = gapminder)
+```
+
+```{r}
+gm <- gm %>%
+  group_by(country) %>%
+  mutate(lifeExp_within = lifeExp-mean(lifeExp),
+         log_gdpPercap_groupmean = mean(log(gdpPercap)),
+         log_gdpPercap_within = log(gdpPercap) - mean(log(gdpPercap)))
+
+Model1 <- lm(lifeExp_within ~ log_gdpPercap_within, data = gm)
+modelsummary(list("Pooled" = Model0, "Absorbed FE" = Model1), stars= T, gof_map = c("nobs","r.squared"), coef_map = c("log(gdpPercap)" = "GDP per capita (ln)", "log_gdpPercap_within"= "GDP per capita (ln)"), vcov = ~country, output = "flextable"
+) %>%
+  flextable::autofit()
+```
+
+# TSCS Data
+
+## Lagged DV (AR: Autoregression)
+
+-   you might alternatively choose to include a measure of the DV in the prior year
+
+```{r}
+gm <- gm %>%
+  group_by(country) %>%
+  mutate(lag_lifeExp = lag(lifeExp))
+
+Model_AR <- lm(lifeExp ~ log(gdpPercap) + lag_lifeExp, data = gm)
+modelsummary(list("Pooled" = Model0, "Absorbed FE" = Model1, "Lagged DV" = Model_AR), stars= T, gof_map = c("nobs","r.squared"), coef_map = c("log(gdpPercap)" = "GDP per capita (ln)", "log_gdpPercap_within"= "GDP per capita (ln)", "lag_lifeExp" = "Life Exp. (t-1)"), vcov = ~country, output = "flextable"
+) %>%
+  flextable::autofit()
+```
+
+## Delta-Delta Models
+
+```{r}
+gm <- gm %>%
+  group_by(country) %>%
+  mutate(delta_lifeExp = lifeExp - lag_lifeExp,
+         delta_log_gdpPercap = log(gdpPercap) - lag(log(gdpPercap)))
+
+Model_Delta <- lm(delta_lifeExp ~ delta_log_gdpPercap, data = gm)
+modelsummary(list("Pooled" = Model0, "Absorbed FE" = Model1, "Lagged DV" = Model_AR, "Deltas" = Model_Delta), stars= T, gof_map = c("nobs","r.squared"), coef_map = c("log(gdpPercap)" = "GDP per capita (ln)", "log_gdpPercap_within"= "GDP per capita (ln)", "delta_log_gdpPercap" = "Change in GDP", "lag_lifeExp" = "Life Exp. (t-1)"), vcov = ~country, output = "flextable"
+) %>%
+  flextable::autofit()
+```
+
+## More Advanced Choices
+
+-   Moving Average: not just last year's DV, but the average over a preceding period of time
+
+-   ARMA: lagged DV and moving average terms
+
+-   ARIMA: similar to deltas model described above
+
+-   multiple levels of lags and moving average processes...
+
+## This is hard!
+
+-   so many choices to make: fixed effects? ARMA? ARIMA? ARIMAX? SARIMAX?
+
+-   best practice is to find an article modeling your DV or something similar, and follow their approach
+
+# BTSCS Data
+
+## When the DV is Binary
+
+-   rather than thinking about a lagged DV, we might think about how many time increments have passed since the last occurrence of the DV
+
+-   We will call these "spells" or "time spells"
+
+-   it used to be that we would compute complex functions called "splines"
+
+-   now we will just throw time spells into our model as controls, with squared and cubic polynomial terms
+
+## Let's Study Civil Wars
+
+```{r}
+FL <- read.csv("FearonLaitin.csv")
+head(FL)
+```
+
+## Create Time Spells
+
+```{r}
+FL <- ps_btscs(FL, war, year, country)
+```
+
+## Create Regressions With and Without
+
+```{r}
+FL_NoSpells <- glm(war~lgdpenl1, data = FL, family = "binomial")
+FL_Spells <- glm(war~lgdpenl1 + spell + I(spell^2) + I(spell^3), data = FL, family = "binomial")
+msummary(list(FL_NoSpells, FL_Spells), stars = T, vcov = ~country, output = "flextable"
+) %>%
+  flextable::autofit()
+```
+
+## Conclusion
+
+-   panel data offers lots of opportunities for examining more fine-grained variation
+
+-   studying long-term changes in continuous variables over time is hard
+
+-   with binary DVs, it's a lot easier
+
+-   pay attention to and copy practices you see in the literature
