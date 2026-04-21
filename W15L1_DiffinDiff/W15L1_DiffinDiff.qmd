@@ -1,0 +1,175 @@
+---
+title: "W15L1: Difference in Differences"
+subtitle: "POLS 642 Intermediate Analysis of Political Data"
+author: "Dr. Ches Thurber"
+format: 
+  revealjs:
+    theme: simple
+    html-math-method: katex
+execute: 
+  echo: true
+editor: visual
+---
+
+## Plan for Today
+
+1\) "Bell Ringer"
+
+2\) Event Studies: Segmented Regression
+
+3\) Difference in Differences
+
+
+## Packages
+
+```{r}
+#install.packages("ggdag")
+
+library(ggplot2)
+library(modelsummary)
+library(dplyr)
+library(fixest)
+library(flextable)
+#install.packages("causaldata")
+library(causaldata)
+
+
+
+```
+
+## Bell-Ringer
+
+I am studying the relationship between different types of regime transitions and democratization (measured with VDEM scores). My units of observation are country-years. How might I handle the time-dependent nature of democracy scores? (Many different correct answers)
+
+
+## Types of Datasets
+
+1\) Cross-sectional data: single observations from each unit (survey responses from a single wave)
+
+2\) Time series data: multiple observations over time from a single unit (daily stock prices)
+
+3\) Panel data: multiple observations over time from multiple unites (aka Time Series Cross-Sectional, TSCS)
+
+## Strengths and Weaknesses
+
+-   allows you to get more observations from your data (maybe)
+
+-   track within group variation
+
+-   But data from within groups will be highly correlated
+
+-   FEs was one approach to dealing with this
+
+# Segmented Regression (Event Study)
+
+## What is it?
+
+-   time-series (not panel data), where there is a "treatment" event at one point in time
+
+-   does the relationship between time and outcome change after the event?
+
+-   model with a simple interaction term:
+
+    $$
+    \hat{Y_i} = \beta_0 + \beta_1t + \beta_2After + \beta_3t*After + \epsilon
+    $$
+
+## Cardiac Study Event
+
+![](https://theeffectbook.net/the-effect_files/figure-html/eventstudies-ambulances-1.png)
+
+## The Concept of the Segmented Regression
+
+-   Is the line different before versus after the event? In either intercept of slope!
+
+-   You are comparing the post-treatment data to an assumed counterfactual that the trend before treatment would have continued if not for the treatment
+
+-   But what if other things happened around that point in time that would have caused a change in trend even if the treatment had not occurred?
+
+# Difference in Difference
+
+## The Concept
+
+-   when we have something akin to a treatment that is unlikely to be randomly applied and want to assess "before and after" effects, comparing treatment to nontreatment cases
+
+-   in other words, we will compare not just before and after treatment in treated cases, but compare that difference to before and after the same point in time for untreated cases
+
+-   e.g. What if we we had some districts that had implemented the Ambulance Quality reforms and others that did not?
+
+## John Snow Example
+
+| Region Supplier     | Death Rates in 1949 | Death Rates in 1854 |
+|---------------------|---------------------|---------------------|
+| Non-Lambeth (Dirty) | 134.9               | 146.6               |
+| Lambeth (Clean)     | 130.1               | 84.9                |
+
+: Death rates are deaths per 10,000 for the 1851 population from Snow (1855)
+
+## How It's Done with Regression
+
+-   create dummy variable for "TreatedGroup" (those units for which treatment was applied)
+
+-   create a dummy variable for "AfterTreatment" (those units that came temporally after when the treatment was applied, even to the non-treatment groups)
+
+-   create an interaction of TreatedGroup x AfterTreatment (this is what we'll be interested in)
+
+-   use standard errors clustered at the group level
+
+$$ 
+\begin{aligned}
+\hat{Y_i} = \beta_0 + \beta_1TreatedGroup + \beta_2AfterTreatment + \\
+\beta_3TreatedGroup * AfterTreatment + \epsilon 
+\end{aligned}$$
+
+## Example: CA Organ Donation Policy Change
+
+![](https://theeffectbook.net/the-effect_files/figure-html/differenceindifferences-rawdonations-1.png)
+
+## In Action: Creating the Data
+
+```{r}
+od <- causaldata::organ_donations
+
+od <- od %>%
+     mutate(TreatedGroup = State == 'California',
+            AfterTreatment = Quarter %in% c('Q32011','Q42011','Q12012'))
+
+```
+
+## In Action: Running the Regression
+
+```{r}
+Model1 <- lm(Rate ~ TreatedGroup * AfterTreatment, data = od)
+msummary(Model1, vcov = ~State, stars = T, output = "flextable", gof_map = c("nobs", "r.squared", "vcov.type")
+) %>%
+  flextable::autofit()
+```
+
+## Two-Way Fixed Effects Diff-in-Diff
+
+```{r}
+od <- od %>%
+     mutate(Treated = State == 'California'& Quarter %in% c('Q32011','Q42011','Q12012'))
+Model2 <- feols(Rate ~ Treated | State + Quarter, data = od)
+msummary(list(Model1, Model2), vcov = ~State, stars = T, output = "flextable", gof_map = c("nobs", "r.squared", "vcov.type")
+) %>%
+  flextable::autofit()
+```
+
+## Considerations
+
+-   What if the treatment is applied at different points in time in different groups? (e.g. Maryland does the same thing, but in 2012, Vermont in 2013, etc...)
+
+-   Parallel trends assumption
+
+-   Additional covariates?
+
+-   Literature on Diff in Diffs is getting updated daily with new problems to worry about...
+
+## Conclusion
+
+-   Diff in Diffs can be a powerful tool if you have panel data with some kind of treatment/intervention in some groups, but not others
+
+-   But there are all kinds of assumptions and rapidly evolving debates on best practices
+
+-   You should consider if your research/question and data are a good fit, BUT you will need to head into the weeds a little bit to figure out exactly how to implement
